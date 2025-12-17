@@ -35,7 +35,7 @@ pipeline {
                     git(
                         url: 'https://github.com/Omar-Eldamaty/Giza-Systems-FP.git',
                         branch: 'main',
-			credentialsId: 'github-pat-wagih'
+                        credentialsId: 'github-pat-wagih'
                     )
                 }
             }
@@ -45,10 +45,13 @@ pipeline {
             steps {
                 sh '''
                   export ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR}
+
                   ansible-playbook infra/deploy.yml \
+                    -i infra/inventory \
                     -e deploy_script=infra/deployAdmin.sh
                 '''
             }
         }
     }
 }
+
