@@ -47,7 +47,7 @@ pipeline {
             steps {
                 sh '''
                   export ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR}
-                  ansible-playbook infra/playbooks/deploy-frontend.yml \
+                  ansible-playbook infra/deploy.yml \
                     -e angular_web_root=/var/www/admin
                 '''
             }
