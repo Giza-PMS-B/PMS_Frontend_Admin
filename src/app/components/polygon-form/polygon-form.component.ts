@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } fr
 import { Router, ActivatedRoute } from '@angular/router';
 import { SiteService } from '../../services/site.service';
 import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
+import { CustomValidators } from '../../validators/custom-validators';
 
 @Component({
   selector: 'app-polygon-form',
@@ -36,6 +37,12 @@ import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
               @if (polygonForm.get('polygonName')?.errors?.['maxlength']) {
                 Maximum length is 100 characters
               }
+              @if (polygonForm.get('polygonName')?.errors?.['mixedText']) {
+                Only Arabic/English letters, numbers, and basic punctuation are allowed
+              }
+              @if (polygonForm.get('polygonName')?.errors?.['uniquePolygonName']) {
+                This polygon name is already in use
+              }
             </div>
           }
         </div>
@@ -44,16 +51,16 @@ import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
           <h3>Map Area</h3>
           <div class="map-placeholder">
             <div class="map-instructions">
-              <p>Click on the map to add points</p>
+              <p>Map displays the coordinates entered below</p>
               <p class="note">Note: This is a placeholder. In a real implementation, integrate with a mapping service like Google Maps or Leaflet.</p>
             </div>
-            <div class="mock-map" (click)="addPointFromMap($event)">
+            <div class="mock-map readonly-map">
               <div class="map-grid"></div>
               @for (coordinate of coordinates(); track $index) {
                 <div 
                   class="map-point" 
-                  [style.left.%]="(coordinate.longitude + 180) / 360 * 100"
-                  [style.top.%]="(90 - coordinate.latitude) / 180 * 100">
+                  [style.left.%]="getMapX(coordinate.longitude)"
+                  [style.top.%]="getMapY(coordinate.latitude)">
                   {{ $index + 1 }}
                 </div>
               }
@@ -72,29 +79,65 @@ import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
           <div formArrayName="coordinates" class="coordinates-list">
             @for (coordinate of coordinatesFormArray.controls; track $index) {
               <div [formGroupName]="$index" class="coordinate-row">
-                <input 
-                  type="number" 
-                  formControlName="latitude" 
-                  step="0.000001"
-                  min="-90" 
-                  max="90"
-                  class="form-control"
-                  [class.error]="isCoordinateFieldInvalid($index, 'latitude')">
+                <div class="coordinate-input-group">
+                  <input 
+                    type="number" 
+                    formControlName="latitude" 
+                    step="0.000001"
+                    class="form-control"
+                    [class.error]="isCoordinateFieldInvalid($index, 'latitude')"
+                    (input)="updateCoordinatesSignal()"
+                    placeholder="Latitude">
+                  @if (isCoordinateFieldInvalid($index, 'latitude')) {
+                    <div class="coordinate-error">
+                      @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['required']) {
+                        Required
+                      }
+                      @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['invalidLatitude']) {
+                        Invalid number
+                      }
+                      @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeRange']) {
+                        Range: -90 to +90
+                      }
+                      @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeDecimalPlaces']) {
+                        Max 6 decimal places
+                      }
+                    </div>
+                  }
+                </div>
                 
-                <input 
-                  type="number" 
-                  formControlName="longitude" 
-                  step="0.000001"
-                  min="-180" 
-                  max="180"
-                  class="form-control"
-                  [class.error]="isCoordinateFieldInvalid($index, 'longitude')">
+                <div class="coordinate-input-group">
+                  <input 
+                    type="number" 
+                    formControlName="longitude" 
+                    step="0.000001"
+                    class="form-control"
+                    [class.error]="isCoordinateFieldInvalid($index, 'longitude')"
+                    (input)="updateCoordinatesSignal()"
+                    placeholder="Longitude">
+                  @if (isCoordinateFieldInvalid($index, 'longitude')) {
+                    <div class="coordinate-error">
+                      @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['required']) {
+                        Required
+                      }
+                      @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['invalidLongitude']) {
+                        Invalid number
+                      }
+                      @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeRange']) {
+                        Range: -180 to +180
+                      }
+                      @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeDecimalPlaces']) {
+                        Max 6 decimal places
+                      }
+                    </div>
+                  }
+                </div>
                 
                 <button 
                   type="button" 
                   class="remove-btn" 
                   (click)="removeCoordinate($index)"
-                  [disabled]="coordinatesFormArray.length <= 3">
+                  [disabled]="coordinatesFormArray.length <= 1">
                   ×
                 </button>
               </div>
@@ -107,7 +150,7 @@ import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
 
           @if (coordinatesFormArray.length < 3) {
             <div class="validation-message">
-              Minimum of 3 coordinates required
+              Minimum of 3 coordinates required for a valid polygon
             </div>
           }
         </div>
@@ -118,12 +161,29 @@ import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
           </button>
           <button 
             type="submit" 
-            class="btn btn-primary" 
-            [disabled]="!polygonForm.valid || coordinatesFormArray.length < 3">
+            class="btn btn-primary">
             {{ isEdit() ? 'Update Polygon' : 'Save Polygon' }}
           </button>
         </div>
       </form>
+
+      @if (showMessage()) {
+        <div class="success-message">
+          <div class="message-content">
+            <span class="success-icon">✓</span>
+            <span class="message-text">{{ message() }}</span>
+          </div>
+        </div>
+      }
+
+      @if (showErrorMessage()) {
+        <div class="error-message-toast">
+          <div class="message-content">
+            <span class="error-icon">✕</span>
+            <span class="message-text">{{ errorMessage() }}</span>
+          </div>
+        </div>
+      }
     </div>
   `,
   styleUrl: './polygon-form.component.scss'
@@ -133,6 +193,10 @@ export class PolygonFormComponent implements OnInit {
   siteId = signal<string>('');
   isEdit = signal<boolean>(false);
   coordinates = signal<Coordinate[]>([]);
+  showMessage = signal<boolean>(false);
+  message = signal<string>('');
+  showErrorMessage = signal<boolean>(false);
+  errorMessage = signal<string>('');
 
   constructor(
     private fb: FormBuilder,
@@ -144,17 +208,33 @@ export class PolygonFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.siteId.set(this.route.snapshot.queryParams['siteId'] || '');
+    const siteId = this.route.snapshot.queryParams['siteId'] || '';
+    const mode = this.route.snapshot.queryParams['mode'] || 'add';
     
-    // Add initial coordinates
-    this.addCoordinate();
-    this.addCoordinate();
-    this.addCoordinate();
+    this.siteId.set(siteId);
+    this.isEdit.set(mode === 'edit');
+    
+    console.log('Polygon form initialized with siteId:', siteId, 'mode:', mode);
+    
+    if (this.isEdit() && siteId && siteId !== 'temp-site-id') {
+      // Load existing polygon data for editing
+      this.loadExistingPolygon(siteId);
+    } else {
+      // Add initial coordinate at (0, 0) for new polygons
+      this.addCoordinate();
+    }
   }
 
   private createForm(): FormGroup {
+    const excludeId = this.isEdit() ? this.siteId() : undefined;
+    
     return this.fb.group({
-      polygonName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(100)]],
+      polygonName: ['', [
+        Validators.required, 
+        Validators.minLength(3), 
+        Validators.maxLength(100),
+        CustomValidators.mixedText()
+      ]],
       coordinates: this.fb.array([])
     });
   }
@@ -165,40 +245,33 @@ export class PolygonFormComponent implements OnInit {
 
   private createCoordinateGroup(lat: number = 0, lng: number = 0): FormGroup {
     return this.fb.group({
-      latitude: [lat, [Validators.required, Validators.min(-90), Validators.max(90)]],
-      longitude: [lng, [Validators.required, Validators.min(-180), Validators.max(180)]]
+      latitude: [lat, [Validators.required, CustomValidators.latitude()]],
+      longitude: [lng, [Validators.required, CustomValidators.longitude()]]
     });
   }
 
   addCoordinate(): void {
-    this.coordinatesFormArray.push(this.createCoordinateGroup());
+    const newCoordinate = this.createCoordinateGroup(0, 0);
+    this.coordinatesFormArray.push(newCoordinate);
+    
+    // Subscribe to changes in the new coordinate inputs
+    newCoordinate.valueChanges.subscribe(() => {
+      this.updateCoordinatesSignal();
+    });
+    
     this.updateCoordinatesSignal();
   }
 
   removeCoordinate(index: number): void {
-    if (this.coordinatesFormArray.length > 3) {
+    if (this.coordinatesFormArray.length > 1) {
       this.coordinatesFormArray.removeAt(index);
       this.updateCoordinatesSignal();
     }
   }
 
-  addPointFromMap(event: MouseEvent): void {
-    const rect = (event.target as HTMLElement).getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width;
-    const y = (event.clientY - rect.top) / rect.height;
-    
-    // Convert to approximate lat/lng (this is just for demo)
-    const lng = (x * 360) - 180;
-    const lat = 90 - (y * 180);
-    
-    this.coordinatesFormArray.push(this.createCoordinateGroup(
-      Math.round(lat * 1000000) / 1000000,
-      Math.round(lng * 1000000) / 1000000
-    ));
-    this.updateCoordinatesSignal();
-  }
 
-  private updateCoordinatesSignal(): void {
+
+  updateCoordinatesSignal(): void {
     const coords: Coordinate[] = this.coordinatesFormArray.value;
     this.coordinates.set(coords);
   }
@@ -214,6 +287,9 @@ export class PolygonFormComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // Mark all fields as touched to show validation errors
+    this.markFormGroupTouched(this.polygonForm);
+    
     if (this.polygonForm.valid && this.coordinatesFormArray.length >= 3) {
       const formValue = this.polygonForm.value;
       const request: CreatePolygonRequest = {
@@ -222,26 +298,181 @@ export class PolygonFormComponent implements OnInit {
         siteId: this.siteId()
       };
 
-      // For demo purposes, just simulate polygon creation
-      console.log('Polygon created:', request);
-
-      // Set polygon as added in localStorage
-      localStorage.setItem('polygonAdded', 'true');
-
-      // Show success message briefly
-      alert('Polygon saved successfully!');
-
-      // Check where to return
       const returnTo = this.route.snapshot.queryParams['returnTo'];
+      
       if (returnTo === 'add-site') {
-        // Return to add-site form with polygon added flag
-        this.router.navigate(['/admin/add-site'], {
-          queryParams: { polygonAdded: 'true' }
-        });
+        // For new sites: store polygon data temporarily
+        localStorage.setItem('polygonAdded', 'true');
+        localStorage.setItem('tempPolygonData', JSON.stringify({
+          name: request.name,
+          coordinates: request.coordinates
+        }));
+        
+        this.showSuccessMessage();
       } else {
-        // Return to admin dashboard
-        this.router.navigate(['/admin']);
+        // For existing sites: create or update the polygon
+        const action = this.isEdit() ? 'Updating' : 'Creating';
+        console.log(`${action} polygon for existing site:`, request);
+        
+        this.siteService.createPolygon(request).subscribe({
+          next: (polygon) => {
+            console.log(`Polygon ${this.isEdit() ? 'updated' : 'created'} successfully:`, polygon);
+            // Refresh the selected site to show updated polygon status
+            this.siteService.getSiteById(this.siteId()).subscribe(updatedSite => {
+              if (updatedSite) {
+                this.siteService.selectSite(updatedSite);
+              }
+            });
+            
+            this.showSuccessMessage();
+          },
+          error: (error) => {
+            console.error(`Error ${this.isEdit() ? 'updating' : 'creating'} polygon:`, error);
+            alert(`Error ${this.isEdit() ? 'updating' : 'saving'} polygon. Please try again.`);
+          }
+        });
       }
+    } else {
+      // Show validation errors
+      let errorMsg = '';
+      
+      if (!this.polygonForm.get('polygonName')?.valid) {
+        if (this.polygonForm.get('polygonName')?.errors?.['required']) {
+          errorMsg = 'Polygon name is required';
+        } else if (this.polygonForm.get('polygonName')?.errors?.['minlength']) {
+          errorMsg = 'Polygon name must be at least 3 characters';
+        } else if (this.polygonForm.get('polygonName')?.errors?.['maxlength']) {
+          errorMsg = 'Polygon name must not exceed 100 characters';
+        }
+      } else if (this.coordinatesFormArray.length < 3) {
+        errorMsg = 'At least 3 coordinate points are required';
+      } else {
+        errorMsg = 'Please fix the validation errors before saving';
+      }
+      
+      this.showValidationError(errorMsg);
+    }
+  }
+
+  private showValidationError(message: string): void {
+    this.errorMessage.set(message);
+    this.showErrorMessage.set(true);
+    
+    // Hide error message after 3 seconds
+    setTimeout(() => {
+      this.showErrorMessage.set(false);
+    }, 3000);
+  }
+
+  getMapX(longitude: number): number {
+    // Convert longitude (-180 to 180) to percentage (0 to 100)
+    return ((longitude + 180) / 360) * 100;
+  }
+
+  getMapY(latitude: number): number {
+    // Convert latitude (-90 to 90) to percentage (0 to 100)
+    // Note: Map Y is inverted (0 at top, 100 at bottom)
+    return ((90 - latitude) / 180) * 100;
+  }
+
+  private loadExistingPolygon(siteId: string): void {
+    this.siteService.getSiteById(siteId).subscribe(site => {
+      if (site && site.polygon) {
+        console.log('Loading existing polygon:', site.polygon);
+        
+        // Set polygon name
+        this.polygonForm.get('polygonName')?.setValue(site.polygon.name);
+        
+        // Clear existing coordinates
+        while (this.coordinatesFormArray.length > 0) {
+          this.coordinatesFormArray.removeAt(0);
+        }
+        
+        // Load existing coordinates
+        if (site.polygon.coordinates && site.polygon.coordinates.length > 0) {
+          site.polygon.coordinates.forEach(coord => {
+            this.addCoordinateWithValues(coord.latitude, coord.longitude);
+          });
+        } else {
+          // Fallback: add one coordinate if no coordinates exist
+          this.addCoordinate();
+        }
+      } else {
+        console.log('No existing polygon found, starting with empty form');
+        this.addCoordinate();
+      }
+    });
+  }
+
+  private addCoordinateWithValues(lat: number, lng: number): void {
+    const newCoordinate = this.createCoordinateGroup(lat, lng);
+    this.coordinatesFormArray.push(newCoordinate);
+    
+    // Subscribe to changes in the new coordinate inputs
+    newCoordinate.valueChanges.subscribe(() => {
+      this.updateCoordinatesSignal();
+    });
+    
+    this.updateCoordinatesSignal();
+  }
+
+  private markFormGroupTouched(formGroup: FormGroup): void {
+    Object.keys(formGroup.controls).forEach(key => {
+      const control = formGroup.get(key);
+      control?.markAsTouched();
+
+      if (control instanceof FormGroup) {
+        this.markFormGroupTouched(control);
+      } else if (control instanceof FormArray) {
+        control.controls.forEach((arrayControl) => {
+          if (arrayControl instanceof FormGroup) {
+            this.markFormGroupTouched(arrayControl);
+          } else {
+            arrayControl.markAsTouched();
+          }
+        });
+      }
+    });
+  }
+
+  private showSuccessMessage(): void {
+    const message = this.isEdit() ? 'Polygon updated successfully!' : 'Polygon saved successfully!';
+    this.message.set(message);
+    this.showMessage.set(true);
+    
+    // Hide message and navigate after 1.5 seconds
+    setTimeout(() => {
+      this.showMessage.set(false);
+      
+      // Navigate after message disappears
+      setTimeout(() => {
+        const returnTo = this.route.snapshot.queryParams['returnTo'];
+        if (returnTo === 'add-site') {
+          // For new sites: return to add-site form
+          this.router.navigate(['/admin/add-site'], {
+            queryParams: { polygonAdded: 'true' }
+          });
+        } else {
+          // For existing sites: go to dashboard and select the site
+          this.navigateToSiteInDashboard();
+        }
+      }, 300);
+    }, 1500);
+  }
+
+  private navigateToSiteInDashboard(): void {
+    const siteId = this.siteId();
+    if (siteId && siteId !== 'temp-site-id') {
+      // Get the site and select it in the dashboard
+      this.siteService.getSiteById(siteId).subscribe(site => {
+        if (site) {
+          this.siteService.selectSite(site);
+        }
+        this.router.navigate(['/admin']);
+      });
+    } else {
+      // Fallback to just navigate to admin
+      this.router.navigate(['/admin']);
     }
   }
 

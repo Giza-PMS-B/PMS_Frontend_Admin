@@ -263,3 +263,20 @@
     border: 1px solid #ffeaa7;
   }
 }
+
+.info-message {
+  margin-bottom: 1.5rem;
+  
+  .info-content {
+    padding: 1rem;
+    background: #e3f2fd;
+    border: 1px solid #bbdefb;
+    border-radius: 6px;
+    
+    .info-text {
+      font-size: 0.875rem;
+      color: #1565c0;
+      line-height: 1.4;
+    }
+  }
+}

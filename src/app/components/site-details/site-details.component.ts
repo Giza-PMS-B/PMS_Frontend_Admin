@@ -53,17 +53,17 @@ import { Site } from '../../models/site.model';
             </div>
           }
 
-          <div class="actions">
-            <button class="btn btn-primary" (click)="editSite.emit(selectedSite)">
-              Edit
-            </button>
-            
-            @if (selectedSite.type === 'leaf') {
+          @if (selectedSite.type === 'leaf') {
+            <div class="actions">
+              <button class="btn btn-primary" (click)="editSite.emit(selectedSite)">
+                Edit
+              </button>
+              
               <button class="btn btn-secondary" (click)="editPolygon.emit(selectedSite)">
                 {{ selectedSite.polygon ? 'Edit Polygon' : 'Add Polygon' }}
               </button>
-            }
-          </div>
+            </div>
+          }
         </div>
       } @else {
         <div class="no-selection">
