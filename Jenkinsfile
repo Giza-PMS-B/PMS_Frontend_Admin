@@ -29,11 +29,23 @@ pipeline {
             }
         }
 
+        stage('Checkout Infra') {
+            steps {
+                dir("infra") {
+                    git(
+                        url: 'https://github.com/Omar-Eldamaty/Giza-Systems-FP.git',
+                        branch: 'main'
+                    )
+                }
+            }
+        }
+
         stage('Deploy Admin') {
             steps {
                 sh '''
-                  sudo ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR} \
-                  ./deployAdmin.sh
+                  export ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR}
+                  ansible-playbook infra/deploy.yml \
+                    -e deploy_script=infra/deployAdmin.sh
                 '''
             }
         }
