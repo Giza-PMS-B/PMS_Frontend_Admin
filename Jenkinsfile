@@ -48,7 +48,7 @@ pipeline {
 
                   ansible-playbook infra/deploy.yml \
                     -i infra/inventory \
-                    -e deploy_script=infra/deployAdmin.sh
+                    -e deploy_script=deployAdmin.sh
                 '''
             }
         }
