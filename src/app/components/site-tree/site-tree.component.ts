@@ -12,6 +12,7 @@ import { Site } from '../../models/site.model';
         <div class="site-node">
           <div class="site-item" 
                [class.selected]="selectedSiteId === site.id"
+               [class.highlighted-parent]="highlightedParents.has(site.id)"
                (click)="selectSite(site)">
             <span class="site-icon" [class.leaf]="site.type === 'leaf'">
               {{ site.type === 'leaf' ? '■' : '■' }}
@@ -32,8 +33,10 @@ import { Site } from '../../models/site.model';
                 [sites]="site.children"
                 [selectedSiteId]="selectedSiteId"
                 [expandedNodes]="expandedNodes"
+                [highlightedParents]="highlightedParents"
                 (siteSelected)="onSiteSelected($event)"
-                (addChild)="onAddChild($event)">
+                (addChild)="onAddChild($event)"
+                (nodeToggled)="onNodeToggled($event)">
               </app-site-tree>
             </div>
           }
@@ -47,21 +50,18 @@ export class SiteTreeComponent {
   @Input() sites: Site[] = [];
   @Input() selectedSiteId: string | null = null;
   @Input() expandedNodes: Set<string> = new Set();
+  @Input() highlightedParents: Set<string> = new Set();
   
   @Output() siteSelected = new EventEmitter<Site>();
   @Output() addChild = new EventEmitter<Site>();
+  @Output() nodeToggled = new EventEmitter<string>();
 
   selectSite(site: Site): void {
-    this.selectedSiteId = site.id;
     this.siteSelected.emit(site);
     
     // Auto-expand parent nodes
     if (site.type === 'parent') {
-      if (this.expandedNodes.has(site.id)) {
-        this.expandedNodes.delete(site.id);
-      } else {
-        this.expandedNodes.add(site.id);
-      }
+      this.nodeToggled.emit(site.id);
     }
   }
 
@@ -76,5 +76,9 @@ export class SiteTreeComponent {
 
   onAddChild(site: Site): void {
     this.addChild.emit(site);
+  }
+
+  onNodeToggled(nodeId: string): void {
+    this.nodeToggled.emit(nodeId);
   }
 }

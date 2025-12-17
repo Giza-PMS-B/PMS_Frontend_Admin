@@ -100,6 +100,8 @@ export class SiteService {
   }
 
   createPolygon(request: CreatePolygonRequest): Observable<Polygon> {
+    console.log('Creating polygon for siteId:', request.siteId);
+    
     const polygon: Polygon = {
       id: this.generateId(),
       name: request.name,
@@ -110,9 +112,14 @@ export class SiteService {
     const sites = [...this.sitesSubject.value];
     const site = this.findSiteById(sites, request.siteId);
     
+    console.log('Found site:', site);
+    
     if (site) {
       site.polygon = polygon;
       this.updateSitesData(sites);
+      console.log('Polygon attached to site successfully');
+    } else {
+      console.error('Site not found with ID:', request.siteId);
     }
 
     return of(polygon);

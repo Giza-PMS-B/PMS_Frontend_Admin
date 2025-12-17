@@ -25,8 +25,12 @@ import { SiteDetailsComponent } from '../site-details/site-details.component';
           <h3>Sites Tree</h3>
           <app-site-tree 
             [sites]="sites()"
+            [selectedSiteId]="selectedSite()?.id || null"
+            [expandedNodes]="expandedNodes()"
+            [highlightedParents]="highlightedParents()"
             (siteSelected)="onSiteSelected($event)"
-            (addChild)="onAddChild($event)">
+            (addChild)="onAddChild($event)"
+            (nodeToggled)="onNodeToggled($event)">
           </app-site-tree>
         </div>
 
@@ -52,6 +56,8 @@ import { SiteDetailsComponent } from '../site-details/site-details.component';
 export class AdminDashboardComponent implements OnInit {
   sites = signal<Site[]>([]);
   selectedSite = signal<Site | null>(null);
+  expandedNodes = signal<Set<string>>(new Set());
+  highlightedParents = signal<Set<string>>(new Set());
   message = signal<string>('');
   messageType = signal<'success' | 'error'>('success');
   showMessage = signal<boolean>(false);
@@ -68,6 +74,14 @@ export class AdminDashboardComponent implements OnInit {
 
     this.siteService.selectedSite$.subscribe(site => {
       this.selectedSite.set(site);
+      
+      // Auto-expand tree to show the selected site and highlight parents
+      if (site) {
+        this.expandTreeToSite(site);
+        this.highlightParentsOfSite(site);
+      } else {
+        this.highlightedParents.set(new Set());
+      }
     });
   }
 
@@ -93,11 +107,86 @@ export class AdminDashboardComponent implements OnInit {
 
   onEditPolygon(site: Site): void {
     this.router.navigate(['/admin/polygon'], { 
-      queryParams: { siteId: site.id } 
+      queryParams: { 
+        siteId: site.id, 
+        mode: site.polygon ? 'edit' : 'add'
+      } 
     });
   }
 
+  onNodeToggled(nodeId: string): void {
+    const newExpandedNodes = new Set(this.expandedNodes());
+    if (newExpandedNodes.has(nodeId)) {
+      newExpandedNodes.delete(nodeId);
+    } else {
+      newExpandedNodes.add(nodeId);
+    }
+    this.expandedNodes.set(newExpandedNodes);
+  }
 
+
+
+  private expandTreeToSite(targetSite: Site): void {
+    const newExpandedNodes = new Set(this.expandedNodes());
+    
+    // Find the path to the target site and expand all parent nodes
+    const expandPath = (sites: Site[], targetId: string, currentPath: string[] = []): boolean => {
+      for (const site of sites) {
+        const newPath = [...currentPath, site.id];
+        
+        if (site.id === targetId) {
+          // Found the target site, expand all parents in the path
+          currentPath.forEach(parentId => {
+            newExpandedNodes.add(parentId);
+          });
+          return true;
+        }
+        
+        if (site.children && site.children.length > 0) {
+          if (expandPath(site.children, targetId, newPath)) {
+            // Target found in children, expand this node too
+            newExpandedNodes.add(site.id);
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    
+    expandPath(this.sites(), targetSite.id);
+    this.expandedNodes.set(newExpandedNodes);
+  }
+
+  private highlightParentsOfSite(targetSite: Site): void {
+    const highlightedParents = new Set<string>();
+    
+    // Find the path to the target site and highlight all parent nodes
+    const findParentPath = (sites: Site[], targetId: string, currentPath: string[] = []): boolean => {
+      for (const site of sites) {
+        const newPath = [...currentPath, site.id];
+        
+        if (site.id === targetId) {
+          // Found the target site, highlight all parents in the path
+          currentPath.forEach(parentId => {
+            highlightedParents.add(parentId);
+          });
+          return true;
+        }
+        
+        if (site.children && site.children.length > 0) {
+          if (findParentPath(site.children, targetId, newPath)) {
+            // Target found in children, highlight this parent too
+            highlightedParents.add(site.id);
+            return true;
+          }
+        }
+      }
+      return false;
+    };
+    
+    findParentPath(this.sites(), targetSite.id);
+    this.highlightedParents.set(highlightedParents);
+  }
 
   private showMessageWithTimeout(msg: string, type: 'success' | 'error' = 'success'): void {
     this.message.set(msg);
