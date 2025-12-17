@@ -34,7 +34,7 @@ pipeline {
                 dir("infra") {
                     git(
                         url: 'https://github.com/Omar-Eldamaty/Giza-Systems-FP.git',
-                        branch: 'main'
+                        branch: 'main',
 			credentialsId: 'github-pat-wagih'
                     )
                 }
