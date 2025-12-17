@@ -3,8 +3,6 @@ pipeline {
 
     environment {
         FRONTEND_DIR = "frontend"
-        INFRA_DIR    = "infra"
-
         ANGULAR_BUILD_DIR = "${WORKSPACE}/${FRONTEND_DIR}/dist/admin/browser"
     }
 
@@ -31,24 +29,11 @@ pipeline {
             }
         }
 
-        stage('Checkout Infra (Ansible)') {
-            steps {
-                dir("${INFRA_DIR}") {
-                    git(
-                        url: 'https://github.com/Omar-Eldamaty/Giza-Systems-FP.git',
-                        branch: 'main',
-                        credentialsId: 'github-pat-wagih'
-                    )
-                }
-            }
-        }
-
-        stage('Deploy Admin Frontend') {
+        stage('Deploy Admin') {
             steps {
                 sh '''
-                  export ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR}
-                  ansible-playbook infra/deploy.yml \
-                    -e angular_web_root=/var/www/admin
+                  sudo ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR} \
+                  ./deployAdmin.sh
                 '''
             }
         }
