@@ -2,55 +2,49 @@ pipeline {
     agent any
 
     environment {
-        FRONTEND_DIR = "frontend"
-        ANGULAR_BUILD_DIR = "${WORKSPACE}/${FRONTEND_DIR}/dist/admin/browser"
+        IMAGE_NAME = "pms-admin-frontend"
+        CONTAINER_NAME = "pms-admin-frontend"
     }
 
     stages {
 
         stage('Checkout Admin Frontend') {
             steps {
-                dir("${FRONTEND_DIR}") {
-                    git(
-                        url: 'https://github.com/Giza-PMS-B/PMS_Frontend_Admin.git',
-                        branch: 'main',
-                        credentialsId: 'github-pat-wagih'
-                    )
-                }
+                git(
+                    url: 'https://github.com/Giza-PMS-B/PMS_Frontend_Admin.git',
+                    branch: 'main',
+                    credentialsId: 'github-pat-wagih'
+                )
             }
         }
 
-        stage('Build Angular (Admin)') {
-            steps {
-                dir("${FRONTEND_DIR}") {
-                    sh 'npm install'
-                    sh 'npm run build -- --base-href=/admin/'
-                }
-            }
-        }
-
-        stage('Checkout Infra') {
-            steps {
-                dir("infra") {
-                    git(
-                        url: 'https://github.com/Omar-Eldamaty/Giza-Systems-FP.git',
-                        branch: 'main',
-                        credentialsId: 'github-pat-wagih'
-                    )
-                }
-            }
-        }
-
-        stage('Deploy Admin') {
+        stage('Build Docker Image (Angular + NGINX)') {
             steps {
                 sh '''
-                  export ANGULAR_BUILD_DIR=${ANGULAR_BUILD_DIR}
-
-                  ansible-playbook infra/deploy.yml \
-                    -i infra/inventory \
-                    -e deploy_script=deployAdmin.sh
+                  docker build -t ${IMAGE_NAME}:latest .
                 '''
             }
+        }
+
+        stage('Deploy Admin Frontend Container') {
+            steps {
+                sh '''
+                  docker rm -f ${CONTAINER_NAME} || true
+                  docker run -d \
+                    --name ${CONTAINER_NAME} \
+                    -p 80:80 \
+                    ${IMAGE_NAME}:latest
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Admin Frontend deployed successfully on port 80"
+        }
+        failure {
+            echo "❌ Admin Frontend deployment failed"
         }
     }
 }
