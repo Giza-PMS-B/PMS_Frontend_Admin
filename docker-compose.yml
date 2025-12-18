@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+  admin-frontend:
+    image: pms-admin-frontend
+    build: .
+    ports:
+      - "80:80"
+    networks:
+      - pms-net
+
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+networks:
+  pms-net:
+    driver: overlay
