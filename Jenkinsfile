@@ -32,7 +32,7 @@ pipeline {
                   docker rm -f ${CONTAINER_NAME} || true
                   docker run -d \
                     --name ${CONTAINER_NAME} \
-                    -p 80:80 \
+                    -p 8085:80 \
                     ${IMAGE_NAME}:latest
                 '''
             }
