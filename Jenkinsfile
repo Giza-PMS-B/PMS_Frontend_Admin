@@ -2,14 +2,14 @@ pipeline {
     agent any
 
     triggers {
-        pollSCM('H/2 * * * *')   // check every 2 minutes
+        pollSCM('H/2 * * * *')
     }
 
     environment {
         IMAGE_NAME = "pms-admin-frontend"
         IMAGE_LATEST = "pms-admin-frontend:latest"
-        IMAGE_BACKUP = "pms-admin-frontend:previous"
-        CONTAINER_NAME = "pms-admin-frontend"
+        STACK_NAME = "pms"
+        SERVICE_NAME = "admin-frontend"
         APP_PORT = "8085"
     }
 
@@ -25,20 +25,7 @@ pipeline {
             }
         }
 
-        stage('Backup Current Image (Rollback Prep)') {
-            steps {
-                sh '''
-                  if docker image inspect ${IMAGE_LATEST} > /dev/null 2>&1; then
-                      echo "Backing up current image"
-                      docker tag ${IMAGE_LATEST} ${IMAGE_BACKUP}
-                  else
-                      echo "No previous image found"
-                  fi
-                '''
-            }
-        }
-
-        stage('Build Docker Image (Angular + NGINX)') {
+        stage('Build Docker Image') {
             steps {
                 sh '''
                   docker build -t ${IMAGE_LATEST} .
@@ -46,17 +33,18 @@ pipeline {
             }
         }
 
-        stage('Deploy Admin Frontend Container') {
+        stage('Init Docker Swarm (If Not Initialized)') {
             steps {
                 sh '''
-                  set -e
+                  docker info | grep -q "Swarm: active" || docker swarm init
+                '''
+            }
+        }
 
-                  docker rm -f ${CONTAINER_NAME} || true
-
-                  docker run -d \
-                    --name ${CONTAINER_NAME} \
-                    -p ${APP_PORT}:80 \
-                    ${IMAGE_LATEST}
+        stage('Deploy to Docker Swarm') {
+            steps {
+                sh '''
+                  docker stack deploy -c docker-compose.yml ${STACK_NAME}
                 '''
             }
         }
@@ -64,7 +52,7 @@ pipeline {
         stage('Health Check') {
             steps {
                 sh '''
-                  sleep 5
+                  sleep 10
                   curl -f http://localhost:${APP_PORT} || exit 1
                 '''
             }
@@ -73,25 +61,11 @@ pipeline {
 
     post {
         success {
-            echo "✅ Admin Frontend deployed successfully on port ${APP_PORT}"
+            echo "✅ Admin Frontend deployed using Docker Swarm with 3 replicas & load balancing"
         }
 
         failure {
-            echo "❌ Deployment failed — rolling back"
-
-            sh '''
-              docker rm -f ${CONTAINER_NAME} || true
-
-              if docker image inspect ${IMAGE_BACKUP} > /dev/null 2>&1; then
-                  docker run -d \
-                    --name ${CONTAINER_NAME} \
-                    -p ${APP_PORT}:80 \
-                    ${IMAGE_BACKUP}
-                  echo "🔁 Rollback completed"
-              else
-                  echo "⚠️ No backup image available — rollback skipped"
-              fi
-            '''
+            echo "❌ Deployment failed"
         }
     }
 }
