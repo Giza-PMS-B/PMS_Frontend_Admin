@@ -40,16 +40,16 @@ import { CustomValidators } from '../../validators/custom-validators';
             @if (isFieldInvalid('nameEn')) {
               <div class="error-message">
                 @if (siteForm.get('nameEn')?.errors?.['required']) {
-                  <div>This field is required</div>
+                  <div>• This field is required</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['minlength'] || siteForm.get('nameEn')?.errors?.['maxlength']) {
-                  <div>The site name must contain number of characters in the range 3 to 100 characters</div>
+                  <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
-                  <div>Only English letters, numbers, and basic punctuation are allowed</div>
+                  <div>• Only English letters, numbers, and basic punctuation are allowed</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
-                  <div>This name is already in use</div>
+                  <div>• This name is already in use</div>
                 }
               </div>
             }
@@ -66,16 +66,16 @@ import { CustomValidators } from '../../validators/custom-validators';
             @if (isFieldInvalid('nameAr')) {
               <div class="error-message">
                 @if (siteForm.get('nameAr')?.errors?.['required']) {
-                  <div>This field is required</div>
+                  <div>• This field is required</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['minlength'] || siteForm.get('nameAr')?.errors?.['maxlength']) {
-                  <div>The site name must contain number of characters in the range 3 to 100 characters</div>
+                  <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
-                  <div>Only Arabic letters, numbers, and basic punctuation are allowed</div>
+                  <div>• Only Arabic letters, numbers, and basic punctuation are allowed</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
-                  <div>This name is already in use</div>
+                  <div>• This name is already in use</div>
                 }
               </div>
             }
@@ -105,28 +105,31 @@ import { CustomValidators } from '../../validators/custom-validators';
             <div class="form-row">
               <div class="form-group">
                 <label for="pricePerHour">Price per Hour: <span class="required">*</span></label>
-                <input 
-                  type="text" 
-                  id="pricePerHour" 
-                  formControlName="pricePerHour" 
-                  (input)="onPriceInput($event)"
-                  (blur)="onPriceBlur($event)"
-                  class="form-control"
-                  [class.error]="isFieldInvalid('pricePerHour')"
-                  placeholder="0.00">
+                <div class="price-input-container">
+                  <input 
+                    type="text" 
+                    id="pricePerHour" 
+                    formControlName="pricePerHour" 
+                    (input)="onPriceInput($event)"
+                    (blur)="onPriceBlur($event)"
+                    class="form-control price-input"
+                    [class.error]="isFieldInvalid('pricePerHour')"
+                    placeholder="0.00">
+                  <span class="currency-suffix">SAR</span>
+                </div>
                 @if (isFieldInvalid('pricePerHour')) {
                   <div class="error-message">
                     @if (siteForm.get('pricePerHour')?.errors?.['required']) {
-                      <div>This field is required</div>
+                      <div>• This field is required</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['min']) {
-                      <div>Price must be greater than 0</div>
+                      <div>• Price must be greater than 0</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['max']) {
-                      <div>Price cannot exceed 999.99</div>
+                      <div>• Price cannot exceed 999.99</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['priceFormat']) {
-                      <div>Price must have exactly 2 decimal places (e.g., 5.00, 10.50)</div>
+                      <div>• Price must have exactly 2 decimal places (e.g., 5.00, 10.50)</div>
                     }
                   </div>
                 }
@@ -145,13 +148,10 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (isFieldInvalid('numberOfSlots')) {
                   <div class="error-message">
                     @if (siteForm.get('numberOfSlots')?.errors?.['required']) {
-                      <div>This field is required</div>
+                      <div>• This field is required</div>
                     }
-                    @if (siteForm.get('numberOfSlots')?.errors?.['min']) {
-                      <div>Minimum value is 1</div>
-                    }
-                    @if (siteForm.get('numberOfSlots')?.errors?.['max']) {
-                      <div>Maximum value is 10000</div>
+                    @if (siteForm.get('numberOfSlots')?.errors?.['min'] || siteForm.get('numberOfSlots')?.errors?.['max']) {
+                      <div>• The number of slots should be in the range of 1 to 10000 slot</div>
                     }
                   </div>
                 }
@@ -169,19 +169,19 @@ import { CustomValidators } from '../../validators/custom-validators';
               @if (isFieldInvalid('integrationCode')) {
                 <div class="error-message">
                   @if (siteForm.get('integrationCode')?.errors?.['required']) {
-                    <div>This field is required</div>
+                    <div>• This field is required</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['minlength']) {
-                    <div>Minimum length is 3 characters</div>
+                    <div>• Minimum length is 3 characters</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['maxlength']) {
-                    <div>Maximum length is 100 characters</div>
+                    <div>• Maximum length is 100 characters</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['integrationCodeFormat']) {
-                    <div>Only letters, numbers, hyphens, spaces, and underscores are allowed</div>
+                    <div>• Only letters, numbers, hyphens, spaces, and underscores are allowed</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['uniqueIntegrationCode']) {
-                    <div>This integration code is already in use</div>
+                    <div>• This integration code is already in use</div>
                   }
                 </div>
               }
