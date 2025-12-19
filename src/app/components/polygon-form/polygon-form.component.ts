@@ -31,11 +31,8 @@ import { CustomValidators } from '../../validators/custom-validators';
               @if (polygonForm.get('polygonName')?.errors?.['required']) {
                 Polygon name is required
               }
-              @if (polygonForm.get('polygonName')?.errors?.['minlength']) {
-                Minimum length is 3 characters
-              }
-              @if (polygonForm.get('polygonName')?.errors?.['maxlength']) {
-                Maximum length is 100 characters
+              @if (polygonForm.get('polygonName')?.errors?.['minlength'] || polygonForm.get('polygonName')?.errors?.['maxlength']) {
+                The polygon name must contain number of characters in the range 3 to 100 characters
               }
               @if (polygonForm.get('polygonName')?.errors?.['mixedText']) {
                 Only Arabic/English letters, numbers, and basic punctuation are allowed

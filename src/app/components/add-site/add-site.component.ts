@@ -42,11 +42,8 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (siteForm.get('nameEn')?.errors?.['required']) {
                   Name (EN) is required
                 }
-                @if (siteForm.get('nameEn')?.errors?.['minlength']) {
-                  Minimum length is 3 characters
-                }
-                @if (siteForm.get('nameEn')?.errors?.['maxlength']) {
-                  Maximum length is 100 characters
+                @if (siteForm.get('nameEn')?.errors?.['minlength'] || siteForm.get('nameEn')?.errors?.['maxlength']) {
+                  The site name must contain number of characters in the range 3 to 100 characters
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
                   Only English letters, numbers, and basic punctuation are allowed
@@ -71,11 +68,8 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (siteForm.get('nameAr')?.errors?.['required']) {
                   Name (AR) is required
                 }
-                @if (siteForm.get('nameAr')?.errors?.['minlength']) {
-                  Minimum length is 3 characters
-                }
-                @if (siteForm.get('nameAr')?.errors?.['maxlength']) {
-                  Maximum length is 100 characters
+                @if (siteForm.get('nameAr')?.errors?.['minlength'] || siteForm.get('nameAr')?.errors?.['maxlength']) {
+                  The site name must contain number of characters in the range 3 to 100 characters
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
                   Only Arabic letters, numbers, and basic punctuation are allowed
