@@ -35,7 +35,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                 <div>• The polygon name must contain number of characters in the range 3 to 100 characters</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['mixedText']) {
-                <div>• Only Arabic/English letters, numbers, and basic punctuation are allowed</div>
+                <div>• Please enter valid input using Arabic/English letters, and the following special characters: [ - , _ , space, .]</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['uniquePolygonName']) {
                 <div>• This polygon name is already in use</div>
@@ -150,6 +150,12 @@ import { CustomValidators } from '../../validators/custom-validators';
               Minimum of 3 coordinates required for a valid polygon
             </div>
           }
+
+          @if (coordinatesFormArray.errors?.['duplicateCoordinates']) {
+            <div class="validation-message error">
+              • Duplicate points are not allowed in the polygon
+            </div>
+          }
         </div>
 
         <div class="form-actions">
@@ -230,7 +236,7 @@ export class PolygonFormComponent implements OnInit {
         Validators.maxLength(100),
         CustomValidators.mixedText()
       ]],
-      coordinates: this.fb.array([])
+      coordinates: this.fb.array([], [CustomValidators.noDuplicateCoordinates()])
     });
   }
 
@@ -269,6 +275,8 @@ export class PolygonFormComponent implements OnInit {
   updateCoordinatesSignal(): void {
     const coords: Coordinate[] = this.coordinatesFormArray.value;
     this.coordinates.set(coords);
+    // Trigger validation to check for duplicate coordinates
+    this.coordinatesFormArray.updateValueAndValidity();
   }
 
   isFieldInvalid(fieldName: string): boolean {

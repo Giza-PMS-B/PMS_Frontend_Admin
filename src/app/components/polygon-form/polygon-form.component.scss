@@ -283,6 +283,14 @@
   color: #dc3545;
   font-size: 0.75rem;
   margin-top: 0.5rem;
+  
+  &.error {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-weight: 500;
+  }
 }
 
 .error-message {

@@ -46,7 +46,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
-                  <div>• Only English letters, numbers, and basic punctuation are allowed</div>
+                  <div>• Please enter valid input using English letters, and the following special characters: [ - , _ , space, .]</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
                   <div>• This name is already in use</div>
@@ -72,7 +72,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
-                  <div>• Only Arabic letters, numbers, and basic punctuation are allowed</div>
+                  <div>• Please enter valid input using Arabic letters, and the following special characters: [ - , _ , space, .]</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
                   <div>• This name is already in use</div>
