@@ -46,7 +46,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
-                  <div>• Only English letters, numbers, and basic punctuation are allowed</div>
+                  <div>• Please enter valid input using English letters, and the following special characters: [ - , _ , space, .]</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
                   <div>• This name is already in use</div>
@@ -72,7 +72,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
-                  <div>• Only Arabic letters, numbers, and basic punctuation are allowed</div>
+                  <div>• Please enter valid input using Arabic letters, and the following special characters: [ - , _ , space, .]</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
                   <div>• This name is already in use</div>
@@ -165,23 +165,25 @@ import { CustomValidators } from '../../validators/custom-validators';
                 id="integrationCode" 
                 formControlName="integrationCode" 
                 class="form-control"
-                [class.error]="isFieldInvalid('integrationCode')">
+                [class.error]="isFieldInvalid('integrationCode')"
+                maxlength="100"
+                (input)="onIntegrationCodeInput($event)">
               @if (isFieldInvalid('integrationCode')) {
                 <div class="error-message">
                   @if (siteForm.get('integrationCode')?.errors?.['required']) {
                     <div>• This field is required</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['minlength']) {
-                    <div>• Minimum length is 3 characters</div>
+                    <div>• The minimum length is 3 characters</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['maxlength']) {
-                    <div>• Maximum length is 100 characters</div>
+                    <div>• The maximum letters is 100 characters</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['integrationCodeFormat']) {
-                    <div>• Only letters, numbers, hyphens, spaces, and underscores are allowed</div>
+                    <div>• Please enter a valid format</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['uniqueIntegrationCode']) {
-                    <div>• This integration code is already in use</div>
+                    <div>• Integration Code Already Exists</div>
                   }
                 </div>
               }
@@ -482,6 +484,18 @@ export class AddSiteComponent implements OnInit {
       this.siteForm.get('pricePerHour')?.setValue(formattedValue);
     } else {
       this.siteForm.get('pricePerHour')?.setValue(null);
+    }
+  }
+
+  onIntegrationCodeInput(event: any): void {
+    const input = event.target;
+    let value = input.value;
+    
+    // Trim to maximum 100 characters
+    if (value.length > 100) {
+      value = value.substring(0, 100);
+      input.value = value;
+      this.siteForm.get('integrationCode')?.setValue(value, { emitEvent: false });
     }
   }
 

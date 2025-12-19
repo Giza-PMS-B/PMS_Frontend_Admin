@@ -46,8 +46,8 @@ export class CustomValidators {
         return null;
       }
       
-      // Arabic characters, numbers, spaces, and common punctuation
-      const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9\s\-_.,!?()]+$/;
+      // Arabic characters, numbers, and only specific special characters: - _ space .
+      const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9\s\-_.]+$/;
       return pattern.test(control.value) ? null : { arabicText: { value: control.value } };
     };
   }
@@ -59,8 +59,8 @@ export class CustomValidators {
         return null;
       }
       
-      // English letters, numbers, spaces, and common punctuation
-      const pattern = /^[a-zA-Z0-9\s\-_.,!?()]+$/;
+      // English letters, numbers, and only specific special characters: - _ space .
+      const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
       return pattern.test(control.value) ? null : { englishText: { value: control.value } };
     };
   }
@@ -72,8 +72,8 @@ export class CustomValidators {
         return null;
       }
       
-      // Accepts letters, numbers, '-', space, '_'
-      const pattern = /^[a-zA-Z0-9\-\s_]+$/;
+      // Accepts letters, numbers, and only specific special characters: - _ space .
+      const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
       return pattern.test(control.value) ? null : { integrationCodeFormat: { value: control.value } };
     };
   }
@@ -158,8 +158,8 @@ export class CustomValidators {
         return null;
       }
       
-      // Arabic and English characters, numbers, spaces, and common punctuation
-      const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9\s\-_.,!?()]+$/;
+      // Arabic and English characters, numbers, and only specific special characters: - _ space .
+      const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9\s\-_.]+$/;
       return pattern.test(control.value) ? null : { mixedText: { value: control.value } };
     };
   }
@@ -178,6 +178,36 @@ export class CustomValidators {
         }),
         catchError(() => of(null))
       );
+    };
+  }
+
+  // Duplicate coordinates validator for FormArray
+  static noDuplicateCoordinates(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value || !Array.isArray(control.value)) {
+        return null;
+      }
+
+      const coordinates = control.value;
+      const coordinateStrings = new Set<string>();
+
+      for (let i = 0; i < coordinates.length; i++) {
+        const coord = coordinates[i];
+        if (coord && coord.latitude !== null && coord.longitude !== null && 
+            coord.latitude !== undefined && coord.longitude !== undefined) {
+          
+          // Create a string representation of the coordinate pair
+          const coordString = `${coord.latitude},${coord.longitude}`;
+          
+          if (coordinateStrings.has(coordString)) {
+            return { duplicateCoordinates: { message: 'Duplicate points are not allowed in the polygon' } };
+          }
+          
+          coordinateStrings.add(coordString);
+        }
+      }
+
+      return null;
     };
   }
 
