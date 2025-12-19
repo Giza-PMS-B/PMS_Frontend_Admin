@@ -31,7 +31,7 @@ import { Site } from '../../models/site.model';
             <div class="leaf-details">
               <div class="detail-row">
                 <label>Price per Hour:</label>
-                <span class="price">\${{ selectedSite.pricePerHour }}</span>
+                <span class="price">{{ selectedSite.pricePerHour }} SAR</span>
               </div>
               
               <div class="detail-row">

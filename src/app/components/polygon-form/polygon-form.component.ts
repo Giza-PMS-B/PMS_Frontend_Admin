@@ -29,16 +29,16 @@ import { CustomValidators } from '../../validators/custom-validators';
           @if (isFieldInvalid('polygonName')) {
             <div class="error-message">
               @if (polygonForm.get('polygonName')?.errors?.['required']) {
-                <div>This field is required</div>
+                <div>• This field is required</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['minlength'] || polygonForm.get('polygonName')?.errors?.['maxlength']) {
-                <div>The polygon name must contain number of characters in the range 3 to 100 characters</div>
+                <div>• The polygon name must contain number of characters in the range 3 to 100 characters</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['mixedText']) {
-                <div>Only Arabic/English letters, numbers, and basic punctuation are allowed</div>
+                <div>• Only Arabic/English letters, numbers, and basic punctuation are allowed</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['uniquePolygonName']) {
-                <div>This polygon name is already in use</div>
+                <div>• This polygon name is already in use</div>
               }
             </div>
           }
@@ -88,16 +88,16 @@ import { CustomValidators } from '../../validators/custom-validators';
                   @if (isCoordinateFieldInvalid($index, 'latitude')) {
                     <div class="coordinate-error">
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['required']) {
-                        <div>This field is required</div>
+                        <div>• This field is required</div>
                       }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['invalidLatitude']) {
-                        <div>Invalid number</div>
+                        <div>• Invalid number</div>
                       }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeRange']) {
-                        <div>Range: -90 to +90</div>
+                        <div>• Range: -90 to +90</div>
                       }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeDecimalPlaces']) {
-                        <div>Max 6 decimal places</div>
+                        <div>• Max 6 decimal places</div>
                       }
                     </div>
                   }
@@ -115,16 +115,16 @@ import { CustomValidators } from '../../validators/custom-validators';
                   @if (isCoordinateFieldInvalid($index, 'longitude')) {
                     <div class="coordinate-error">
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['required']) {
-                        <div>This field is required</div>
+                        <div>• This field is required</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['invalidLongitude']) {
-                        <div>Invalid number</div>
+                        <div>• Invalid number</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeRange']) {
-                        <div>Range: -180 to +180</div>
+                        <div>• Range: -180 to +180</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeDecimalPlaces']) {
-                        <div>Max 6 decimal places</div>
+                        <div>• Max 6 decimal places</div>
                       }
                     </div>
                   }
