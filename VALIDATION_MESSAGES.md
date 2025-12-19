@@ -143,13 +143,8 @@ This document contains all error and success messages used throughout the PMS Fr
 
 ### Form-Level Validation Messages
 
-**Polygon Name Errors:**
-- "Polygon name is required"
-- "Polygon name must be at least 3 characters"
-- "Polygon name must not exceed 100 characters"
-
-**Coordinate Errors:**
-- "At least 3 coordinate points are required"
+**General Form Validation:**
+- "Fill all required fields" (shown when save/update is clicked with empty required fields)
 
 ---
 

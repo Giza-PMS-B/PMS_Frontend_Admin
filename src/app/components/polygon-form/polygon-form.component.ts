@@ -330,24 +330,8 @@ export class PolygonFormComponent implements OnInit {
         });
       }
     } else {
-      // Show validation errors
-      let errorMsg = '';
-      
-      if (!this.polygonForm.get('polygonName')?.valid) {
-        if (this.polygonForm.get('polygonName')?.errors?.['required']) {
-          errorMsg = 'Polygon name is required';
-        } else if (this.polygonForm.get('polygonName')?.errors?.['minlength']) {
-          errorMsg = 'Polygon name must be at least 3 characters';
-        } else if (this.polygonForm.get('polygonName')?.errors?.['maxlength']) {
-          errorMsg = 'Polygon name must not exceed 100 characters';
-        }
-      } else if (this.coordinatesFormArray.length < 3) {
-        errorMsg = 'At least 3 coordinate points are required';
-      } else {
-        errorMsg = 'Please fix the validation errors before saving';
-      }
-      
-      this.showValidationError(errorMsg);
+      // Show generic validation error
+      this.showValidationError('Fill all required fields');
     }
   }
 

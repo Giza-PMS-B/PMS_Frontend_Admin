@@ -58,10 +58,6 @@ import { Site } from '../../models/site.model';
               <button class="btn btn-primary" (click)="editSite.emit(selectedSite)">
                 Edit
               </button>
-              
-              <button class="btn btn-secondary" (click)="editPolygon.emit(selectedSite)">
-                {{ selectedSite.polygon ? 'Edit Polygon' : 'Add Polygon' }}
-              </button>
             </div>
           }
         </div>
@@ -79,5 +75,4 @@ export class SiteDetailsComponent {
   @Input() selectedSite: Site | null = null;
   
   @Output() editSite = new EventEmitter<Site>();
-  @Output() editPolygon = new EventEmitter<Site>();
 }

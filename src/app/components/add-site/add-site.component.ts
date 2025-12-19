@@ -194,9 +194,11 @@ import { CustomValidators } from '../../validators/custom-validators';
               <span class="status-value" [class.not-added]="!polygonAdded()" [class.added]="polygonAdded()">
                 {{ polygonAdded() ? '✓ Added' : '■ Not Added' }}
               </span>
-              <button type="button" class="add-polygon-btn" (click)="addPolygon()">
-                {{ polygonAdded() ? 'Edit Polygon' : '+ Add Polygon' }}
-              </button>
+              @if (!polygonAdded()) {
+                <button type="button" class="add-polygon-btn" (click)="addPolygon()">
+                  + Add Polygon
+                </button>
+              }
             </div>
           </div>
         }
