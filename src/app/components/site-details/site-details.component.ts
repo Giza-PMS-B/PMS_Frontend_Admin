@@ -45,10 +45,16 @@ import { Site } from '../../models/site.model';
               </div>
               
               <div class="detail-row">
-                <label>Polygon Status:</label>
-                <span class="polygon-status" [class.added]="selectedSite.polygon">
-                  {{ selectedSite.polygon ? '✓ Added' : '■ Not Added' }}
-                </span>
+                <label>Polygons:</label>
+                @if (selectedSite.polygons && selectedSite.polygons.length > 0) {
+                  <div class="polygon-list">
+                    @for (polygon of selectedSite.polygons; track polygon.id) {
+                      <span class="polygon-name">{{ polygon.name }}</span>
+                    }
+                  </div>
+                } @else {
+                  <span class="polygon-status not-added">■ None Added</span>
+                }
               </div>
             </div>
           }

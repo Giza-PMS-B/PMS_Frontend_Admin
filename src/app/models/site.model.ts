@@ -11,7 +11,7 @@ export interface Site {
   pricePerHour?: number;
   integrationCode?: string;
   numberOfSlots?: number;
-  polygon?: Polygon;
+  polygons?: Polygon[];
 }
 
 export interface Polygon {

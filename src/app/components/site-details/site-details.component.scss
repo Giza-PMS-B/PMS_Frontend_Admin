@@ -74,7 +74,29 @@
         background: #d4edda;
         color: #155724;
       }
+      
+      &.not-added {
+        background: #f8d7da;
+        color: #721c24;
+      }
     }
+  }
+}
+
+.polygon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  .polygon-name {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    background: #d4edda;
+    color: #155724;
+    display: inline-block;
+    max-width: fit-content;
   }
 }
 
