@@ -7,7 +7,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Name (EN) Field Validation
 
 **Required Field Error:**
-- "Name (EN) is required"
+- "This field is required"
 
 **Length Validation Error:**
 - "The site name must contain number of characters in the range 3 to 100 characters"
@@ -21,7 +21,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Name (AR) Field Validation
 
 **Required Field Error:**
-- "Name (AR) is required"
+- "This field is required"
 
 **Length Validation Error:**
 - "The site name must contain number of characters in the range 3 to 100 characters"
@@ -35,7 +35,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Price per Hour Field Validation (Leaf Sites Only)
 
 **Required Field Error:**
-- "Price per hour is required"
+- "This field is required"
 
 **Value Range Errors:**
 - "Price must be greater than 0"
@@ -51,7 +51,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Integration Code Field Validation (Leaf Sites Only)
 
 **Required Field Error:**
-- "Integration code is required"
+- "This field is required"
 
 **Length Validation Errors:**
 - "Minimum length is 3 characters"
@@ -70,7 +70,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Number of Slots Field Validation (Leaf Sites Only)
 
 **Required Field Error:**
-- "Number of slots is required"
+- "This field is required"
 
 **Value Range Errors:**
 - "Minimum value is 1"
@@ -90,7 +90,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Polygon Name Field Validation
 
 **Required Field Error:**
-- "Polygon name is required"
+- "This field is required"
 
 **Length Validation Error:**
 - "The polygon name must contain number of characters in the range 3 to 100 characters"
@@ -112,7 +112,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Latitude Field Validation
 
 **Required Field Error:**
-- "Required"
+- "This field is required"
 
 **Format Errors:**
 - "Invalid number"
@@ -128,7 +128,7 @@ This document contains all error and success messages used throughout the PMS Fr
 ### Longitude Field Validation
 
 **Required Field Error:**
-- "Required"
+- "This field is required"
 
 **Format Errors:**
 - "Invalid number"
