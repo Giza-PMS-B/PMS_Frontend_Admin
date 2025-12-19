@@ -40,19 +40,16 @@ import { CustomValidators } from '../../validators/custom-validators';
             @if (isFieldInvalid('nameEn')) {
               <div class="error-message">
                 @if (siteForm.get('nameEn')?.errors?.['required']) {
-                  Name (EN) is required
+                  <div>This field is required</div>
                 }
-                @if (siteForm.get('nameEn')?.errors?.['minlength']) {
-                  Minimum length is 3 characters
-                }
-                @if (siteForm.get('nameEn')?.errors?.['maxlength']) {
-                  Maximum length is 100 characters
+                @if (siteForm.get('nameEn')?.errors?.['minlength'] || siteForm.get('nameEn')?.errors?.['maxlength']) {
+                  <div>The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
-                  Only English letters, numbers, and basic punctuation are allowed
+                  <div>Only English letters, numbers, and basic punctuation are allowed</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
-                  This name is already in use
+                  <div>This name is already in use</div>
                 }
               </div>
             }
@@ -69,19 +66,16 @@ import { CustomValidators } from '../../validators/custom-validators';
             @if (isFieldInvalid('nameAr')) {
               <div class="error-message">
                 @if (siteForm.get('nameAr')?.errors?.['required']) {
-                  Name (AR) is required
+                  <div>This field is required</div>
                 }
-                @if (siteForm.get('nameAr')?.errors?.['minlength']) {
-                  Minimum length is 3 characters
-                }
-                @if (siteForm.get('nameAr')?.errors?.['maxlength']) {
-                  Maximum length is 100 characters
+                @if (siteForm.get('nameAr')?.errors?.['minlength'] || siteForm.get('nameAr')?.errors?.['maxlength']) {
+                  <div>The site name must contain number of characters in the range 3 to 100 characters</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
-                  Only Arabic letters, numbers, and basic punctuation are allowed
+                  <div>Only Arabic letters, numbers, and basic punctuation are allowed</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
-                  This name is already in use
+                  <div>This name is already in use</div>
                 }
               </div>
             }
@@ -123,16 +117,16 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (isFieldInvalid('pricePerHour')) {
                   <div class="error-message">
                     @if (siteForm.get('pricePerHour')?.errors?.['required']) {
-                      Price per hour is required
+                      <div>This field is required</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['min']) {
-                      Price must be greater than 0
+                      <div>Price must be greater than 0</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['max']) {
-                      Price cannot exceed 999.99
+                      <div>Price cannot exceed 999.99</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['priceFormat']) {
-                      Price must have exactly 2 decimal places (e.g., 5.00, 10.50)
+                      <div>Price must have exactly 2 decimal places (e.g., 5.00, 10.50)</div>
                     }
                   </div>
                 }
@@ -151,13 +145,13 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (isFieldInvalid('numberOfSlots')) {
                   <div class="error-message">
                     @if (siteForm.get('numberOfSlots')?.errors?.['required']) {
-                      Number of slots is required
+                      <div>This field is required</div>
                     }
                     @if (siteForm.get('numberOfSlots')?.errors?.['min']) {
-                      Minimum value is 1
+                      <div>Minimum value is 1</div>
                     }
                     @if (siteForm.get('numberOfSlots')?.errors?.['max']) {
-                      Maximum value is 10000
+                      <div>Maximum value is 10000</div>
                     }
                   </div>
                 }
@@ -175,19 +169,19 @@ import { CustomValidators } from '../../validators/custom-validators';
               @if (isFieldInvalid('integrationCode')) {
                 <div class="error-message">
                   @if (siteForm.get('integrationCode')?.errors?.['required']) {
-                    Integration code is required
+                    <div>This field is required</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['minlength']) {
-                    Minimum length is 3 characters
+                    <div>Minimum length is 3 characters</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['maxlength']) {
-                    Maximum length is 100 characters
+                    <div>Maximum length is 100 characters</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['integrationCodeFormat']) {
-                    Only letters, numbers, hyphens, spaces, and underscores are allowed
+                    <div>Only letters, numbers, hyphens, spaces, and underscores are allowed</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['uniqueIntegrationCode']) {
-                    This integration code is already in use
+                    <div>This integration code is already in use</div>
                   }
                 </div>
               }
@@ -196,12 +190,18 @@ import { CustomValidators } from '../../validators/custom-validators';
 
 
             <div class="polygon-status">
-              <span class="status-label">Polygon Status:</span>
-              <span class="status-value" [class.not-added]="!polygonAdded()" [class.added]="polygonAdded()">
-                {{ polygonAdded() ? '✓ Added' : '■ Not Added' }}
-              </span>
+              <span class="status-label">Polygons:</span>
+              @if (polygonAdded()) {
+                <div class="polygon-list">
+                  @for (polygonName of polygonNames(); track $index) {
+                    <span class="polygon-name">{{ polygonName }}</span>
+                  }
+                </div>
+              } @else {
+                <span class="status-value not-added">■ Not Added</span>
+              }
               <button type="button" class="add-polygon-btn" (click)="addPolygon()">
-                {{ polygonAdded() ? 'Edit Polygon' : '+ Add Polygon' }}
+                + Add Polygon
               </button>
             </div>
           </div>
@@ -237,6 +237,8 @@ export class AddSiteComponent implements OnInit {
   isLeaf = signal<boolean>(false);
   generatedPath = signal<string>('');
   polygonAdded = signal<boolean>(false);
+  polygonCount = signal<number>(0);
+  polygonNames = signal<string[]>([]);
   isEditMode = signal<boolean>(false);
   editingSite = signal<Site | null>(null);
 
@@ -261,13 +263,22 @@ export class AddSiteComponent implements OnInit {
     if (mode === 'edit' && siteId) {
       this.isEditMode.set(true);
       this.loadExistingSite(siteId);
-    }
-
-    // Check if returning from polygon form
-    if (polygonAdded === 'true') {
-      this.polygonAdded.set(true);
-      localStorage.setItem('polygonAdded', 'true');
-      console.log('Returning from polygon form - polygon added');
+      
+      // If returning from polygon form in edit mode, reload the site to get updated polygon data
+      if (polygonAdded === 'true') {
+        console.log('Returning from polygon form in edit mode - reloading site data');
+        // Small delay to ensure the polygon was saved before reloading
+        setTimeout(() => {
+          this.loadExistingSite(siteId);
+        }, 100);
+      }
+    } else {
+      // Check if returning from polygon form (for new sites only)
+      if (polygonAdded === 'true') {
+        this.updatePolygonStatus();
+        localStorage.setItem('polygonAdded', 'true');
+        console.log('Returning from polygon form - polygon added');
+      }
     }
 
     // Handle parent site loading first (for new sites)
@@ -380,6 +391,8 @@ export class AddSiteComponent implements OnInit {
       
       // Reset polygon status when switching to parent
       this.polygonAdded.set(false);
+      this.polygonCount.set(0);
+      this.polygonNames.set([]);
       localStorage.removeItem('polygonAdded');
       localStorage.removeItem('tempPolygonData');
     }
@@ -477,10 +490,13 @@ export class AddSiteComponent implements OnInit {
     this.saveFormData();
     
     // Navigate to polygon form
+    const siteId = this.isEditMode() ? this.editingSite()?.id || 'temp-site-id' : 'temp-site-id';
+    const returnTo = this.isEditMode() ? 'edit-site' : 'add-site';
+    
     this.router.navigate(['/admin/polygon'], { 
       queryParams: { 
-        siteId: 'temp-site-id',
-        returnTo: 'add-site'
+        siteId: siteId,
+        returnTo: returnTo
       } 
     });
   }
@@ -525,21 +541,24 @@ export class AddSiteComponent implements OnInit {
 
         this.siteService.createSite(request).subscribe({
           next: (newSite) => {
-            // If this is a leaf site with a polygon, add the polygon to the site
+            // If this is a leaf site with polygons, add all polygons to the site
             if (this.isLeaf() && this.polygonAdded()) {
-              const polygonData = this.getStoredPolygonData();
-              if (polygonData) {
-                this.siteService.createPolygon({
-                  name: polygonData.name,
-                  coordinates: polygonData.coordinates,
-                  siteId: newSite.id
-                }).subscribe({
-                  next: () => {
-                    console.log('Polygon attached to site successfully');
-                  },
-                  error: (error) => {
-                    console.error('Error attaching polygon to site:', error);
-                  }
+              const polygonsData = this.getStoredPolygonData();
+              if (polygonsData && polygonsData.length > 0) {
+                // Create all polygons for the new site
+                polygonsData.forEach((polygonData, index) => {
+                  this.siteService.createPolygon({
+                    name: polygonData.name,
+                    coordinates: polygonData.coordinates,
+                    siteId: newSite.id
+                  }).subscribe({
+                    next: () => {
+                      console.log(`Polygon ${index + 1} attached to site successfully`);
+                    },
+                    error: (error) => {
+                      console.error(`Error attaching polygon ${index + 1} to site:`, error);
+                    }
+                  });
                 });
               }
             }
@@ -562,6 +581,7 @@ export class AddSiteComponent implements OnInit {
       parentId: this.parentSite()?.id,
       generatedPath: this.generatedPath(),
       polygonAdded: this.polygonAdded(),
+      polygonCount: this.polygonCount(),
       isLeaf: this.isLeaf() // Explicitly save the leaf status
     };
     console.log('Saving form data:', formData);
@@ -582,6 +602,11 @@ export class AddSiteComponent implements OnInit {
         // Restore form values
         this.siteForm.patchValue(formData);
         this.generatedPath.set(formData.generatedPath || '');
+        
+        // Restore polygon count if available
+        if (formData.polygonCount !== undefined) {
+          this.polygonCount.set(formData.polygonCount);
+        }
         
         if (formData.parentId) {
           this.siteService.getSiteById(formData.parentId).subscribe(parent => {
@@ -613,17 +638,39 @@ export class AddSiteComponent implements OnInit {
     
     // Restore polygon status
     if (polygonStatus === 'true') {
-      this.polygonAdded.set(true);
+      this.updatePolygonStatus();
     }
   }
 
-  private getStoredPolygonData(): any {
+  private updatePolygonStatus(): void {
+    const polygonsData = this.getStoredPolygonData();
+    const hasPolygons = polygonsData.length > 0;
+    const names = polygonsData.map(p => p.name);
+    
+    this.polygonAdded.set(hasPolygons);
+    this.polygonCount.set(polygonsData.length);
+    this.polygonNames.set(names);
+    
+    console.log('Updated polygon status:', hasPolygons, 'count:', polygonsData.length, 'names:', names);
+  }
+
+  private getStoredPolygonData(): { name: string; coordinates: any[] }[] {
     try {
       const polygonData = localStorage.getItem('tempPolygonData');
-      return polygonData ? JSON.parse(polygonData) : null;
+      if (polygonData) {
+        const parsed = JSON.parse(polygonData);
+        // Handle both old single polygon format and new array format
+        if (Array.isArray(parsed)) {
+          return parsed;
+        } else {
+          // Convert old single polygon format to array
+          return [parsed];
+        }
+      }
+      return [];
     } catch (error) {
       console.error('Error retrieving polygon data:', error);
-      return null;
+      return [];
     }
   }
 
@@ -657,9 +704,11 @@ export class AddSiteComponent implements OnInit {
           });
         }
         
-        // Check if site has polygon
-        if (site.polygon) {
+        // Check if site has polygons
+        if (site.polygons && site.polygons.length > 0) {
           this.polygonAdded.set(true);
+          this.polygonCount.set(site.polygons.length);
+          this.polygonNames.set(site.polygons.map(p => p.name));
         }
         
         // Apply validators based on leaf status

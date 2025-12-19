@@ -38,8 +38,7 @@ import { SiteDetailsComponent } from '../site-details/site-details.component';
           <h3>Details</h3>
           <app-site-details 
             [selectedSite]="selectedSite()"
-            (editSite)="onEditSite($event)"
-            (editPolygon)="onEditPolygon($event)">
+            (editSite)="onEditSite($event)">
           </app-site-details>
         </div>
       </div>
@@ -105,14 +104,9 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
-  onEditPolygon(site: Site): void {
-    this.router.navigate(['/admin/polygon'], { 
-      queryParams: { 
-        siteId: site.id, 
-        mode: site.polygon ? 'edit' : 'add'
-      } 
-    });
-  }
+
+
+
 
   onNodeToggled(nodeId: string): void {
     const newExpandedNodes = new Set(this.expandedNodes());

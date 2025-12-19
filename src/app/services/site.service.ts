@@ -115,7 +115,12 @@ export class SiteService {
     console.log('Found site:', site);
     
     if (site) {
-      site.polygon = polygon;
+      // Initialize polygons array if it doesn't exist
+      if (!site.polygons) {
+        site.polygons = [];
+      }
+      // Add the new polygon to the array
+      site.polygons.push(polygon);
       this.updateSitesData(sites);
       console.log('Polygon attached to site successfully');
     } else {
