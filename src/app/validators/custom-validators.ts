@@ -72,8 +72,8 @@ export class CustomValidators {
         return null;
       }
       
-      // Accepts letters, numbers, '-', space, '_'
-      const pattern = /^[a-zA-Z0-9\-\s_]+$/;
+      // Accepts letters, numbers, and only specific special characters: - _ space .
+      const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
       return pattern.test(control.value) ? null : { integrationCodeFormat: { value: control.value } };
     };
   }
