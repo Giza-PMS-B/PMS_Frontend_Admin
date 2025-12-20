@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SiteService } from '../../services/site.service';
 import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
 import { CustomValidators } from '../../validators/custom-validators';
@@ -9,17 +10,17 @@ import { CustomValidators } from '../../validators/custom-validators';
 @Component({
   selector: 'app-polygon-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   template: `
     <div class="polygon-form-container">
       <div class="form-header">
-        <h2>{{ isEdit() ? 'Edit Polygon' : 'Add Polygon' }}</h2>
+        <h2>{{ isEdit() ? ('POLYGON.EDIT_POLYGON' | translate) : ('POLYGON.ADD_POLYGON' | translate) }}</h2>
         <button class="close-btn" (click)="goBack()">×</button>
       </div>
 
       <form [formGroup]="polygonForm" (ngSubmit)="onSubmit()" class="polygon-form">
         <div class="form-group">
-          <label for="polygonName">Polygon Name: <span class="required">*</span></label>
+          <label for="polygonName">{{ 'POLYGON.POLYGON_NAME' | translate }}: <span class="required">*</span></label>
           <input 
             type="text" 
             id="polygonName" 
@@ -29,27 +30,27 @@ import { CustomValidators } from '../../validators/custom-validators';
           @if (isFieldInvalid('polygonName')) {
             <div class="error-message">
               @if (polygonForm.get('polygonName')?.errors?.['required']) {
-                <div>• This field is required</div>
+                <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['minlength'] || polygonForm.get('polygonName')?.errors?.['maxlength']) {
-                <div>• The polygon name must contain number of characters in the range 3 to 100 characters</div>
+                <div>• {{ 'VALIDATION.POLYGON_NAME_LENGTH' | translate }}</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['mixedText']) {
-                <div>• Please enter valid input using Arabic/English letters, and the following special characters: [ - , _ , space, .]</div>
+                <div>• {{ 'VALIDATION.MIXED_TEXT' | translate }}</div>
               }
               @if (polygonForm.get('polygonName')?.errors?.['uniquePolygonName']) {
-                <div>• This polygon name is already in use</div>
+                <div>• {{ 'VALIDATION.UNIQUE_POLYGON' | translate }}</div>
               }
             </div>
           }
         </div>
 
         <div class="map-section">
-          <h3>Map Area</h3>
+          <h3>{{ 'POLYGON.MAP_AREA' | translate }}</h3>
           <div class="map-placeholder">
             <div class="map-instructions">
-              <p>Map displays the coordinates entered below</p>
-              <p class="note">Note: This is a placeholder. In a real implementation, integrate with a mapping service like Google Maps or Leaflet.</p>
+              <p>{{ 'POLYGON.MAP_INSTRUCTIONS' | translate }}</p>
+              <p class="note">{{ 'POLYGON.MAP_NOTE' | translate }}</p>
             </div>
             <div class="mock-map readonly-map">
               <div class="map-grid"></div>
@@ -66,11 +67,11 @@ import { CustomValidators } from '../../validators/custom-validators';
         </div>
 
         <div class="coordinates-section">
-          <h3>Coordinates List</h3>
+          <h3>{{ 'POLYGON.COORDINATES_LIST' | translate }}</h3>
           <div class="coordinates-header">
-            <span>Latitude</span>
-            <span>Longitude</span>
-            <span>Actions</span>
+            <span>{{ 'POLYGON.LATITUDE' | translate }}</span>
+            <span>{{ 'POLYGON.LONGITUDE' | translate }}</span>
+            <span>{{ 'POLYGON.ACTIONS' | translate }}</span>
           </div>
           
           <div formArrayName="coordinates" class="coordinates-list">
@@ -88,16 +89,16 @@ import { CustomValidators } from '../../validators/custom-validators';
                   @if (isCoordinateFieldInvalid($index, 'latitude')) {
                     <div class="coordinate-error">
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['required']) {
-                        <div>• This field is required</div>
+                        <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['invalidLatitude']) {
-                        <div>• Invalid number</div>
+                        <div>• {{ 'VALIDATION.INVALID_NUMBER' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeRange']) {
-                        <div>• Range: -90 to +90</div>
+                        <div>• {{ 'VALIDATION.LATITUDE_RANGE' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeDecimalPlaces']) {
-                        <div>• Max 6 decimal places</div>
+                        <div>• {{ 'VALIDATION.DECIMAL_PLACES' | translate }}</div>
                       }
                     </div>
                   }
@@ -115,16 +116,16 @@ import { CustomValidators } from '../../validators/custom-validators';
                   @if (isCoordinateFieldInvalid($index, 'longitude')) {
                     <div class="coordinate-error">
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['required']) {
-                        <div>• This field is required</div>
+                        <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['invalidLongitude']) {
-                        <div>• Invalid number</div>
+                        <div>• {{ 'VALIDATION.INVALID_NUMBER' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeRange']) {
-                        <div>• Range: -180 to +180</div>
+                        <div>• {{ 'VALIDATION.LONGITUDE_RANGE' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeDecimalPlaces']) {
-                        <div>• Max 6 decimal places</div>
+                        <div>• {{ 'VALIDATION.DECIMAL_PLACES' | translate }}</div>
                       }
                     </div>
                   }
@@ -142,30 +143,30 @@ import { CustomValidators } from '../../validators/custom-validators';
           </div>
 
           <button type="button" class="add-coordinate-btn" (click)="addCoordinate()">
-            + Add Coordinate
+            + {{ 'POLYGON.ADD_COORDINATE' | translate }}
           </button>
 
           @if (coordinatesFormArray.length < 3) {
             <div class="validation-message">
-              Minimum of 3 coordinates required for a valid polygon
+              {{ 'POLYGON.MIN_COORDINATES' | translate }}
             </div>
           }
 
           @if (coordinatesFormArray.errors?.['duplicateCoordinates']) {
             <div class="validation-message error">
-              • Duplicate points are not allowed in the polygon
+              • {{ 'POLYGON.DUPLICATE_POINTS' | translate }}
             </div>
           }
         </div>
 
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="goBack()">
-            Cancel
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
           <button 
             type="submit" 
             class="btn btn-primary">
-            {{ isEdit() ? 'Update Polygon' : 'Save Polygon' }}
+            {{ isEdit() ? ('POLYGON.UPDATE_POLYGON' | translate) : ('POLYGON.SAVE_POLYGON' | translate) }}
           </button>
         </div>
       </form>
@@ -174,7 +175,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         <div class="success-message">
           <div class="message-content">
             <span class="success-icon">✓</span>
-            <span class="message-text">{{ message() }}</span>
+            <span class="message-text">{{ message() | translate }}</span>
           </div>
         </div>
       }
@@ -183,7 +184,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         <div class="error-message-toast">
           <div class="message-content">
             <span class="error-icon">✕</span>
-            <span class="message-text">{{ errorMessage() }}</span>
+            <span class="message-text">{{ errorMessage() | translate }}</span>
           </div>
         </div>
       }
@@ -337,12 +338,12 @@ export class PolygonFormComponent implements OnInit {
       }
     } else {
       // Show generic validation error
-      this.showValidationError('Fill all required fields');
+      this.showValidationError('MESSAGES.FILL_REQUIRED_FIELDS');
     }
   }
 
   private showValidationError(message: string): void {
-    this.errorMessage.set(message);
+    this.errorMessage.set('MESSAGES.FILL_REQUIRED_FIELDS');
     this.showErrorMessage.set(true);
     
     // Hide error message after 3 seconds
@@ -425,7 +426,7 @@ export class PolygonFormComponent implements OnInit {
   }
 
   private showSuccessMessage(): void {
-    const message = this.isEdit() ? 'Polygon updated successfully!' : 'Polygon saved successfully!';
+    const message = this.isEdit() ? 'MESSAGES.POLYGON_UPDATED' : 'MESSAGES.POLYGON_CREATED';
     this.message.set(message);
     this.showMessage.set(true);
     

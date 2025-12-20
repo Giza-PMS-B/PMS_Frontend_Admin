@@ -1,51 +1,53 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Site } from '../../models/site.model';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-site-details',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   template: `
     <div class="site-details">
       @if (selectedSite) {
         <div class="details-content">
           <div class="detail-row">
-            <label>Name:</label>
-            <span>{{ selectedSite.nameEn }}</span>
+            <label>{{ 'SITE.NAME' | translate }}:</label>
+            <span>{{ getCurrentSiteName() }}</span>
           </div>
           
           <div class="detail-row">
-            <label>Path:</label>
+            <label>{{ 'SITE.PATH' | translate }}:</label>
             <span class="path">{{ selectedSite.path }}</span>
           </div>
           
           <div class="detail-row">
-            <label>Type:</label>
+            <label>{{ 'SITE.TYPE' | translate }}:</label>
             <span class="type" [class.leaf]="selectedSite.type === 'leaf'">
-              {{ selectedSite.type | titlecase }}
+              {{ selectedSite.type === 'leaf' ? ('SITE.LEAF' | translate) : ('SITE.PARENT' | translate) }}
             </span>
           </div>
 
           @if (selectedSite.type === 'leaf') {
             <div class="leaf-details">
               <div class="detail-row">
-                <label>Price per Hour:</label>
+                <label>{{ 'SITE.PRICE_PER_HOUR' | translate }}:</label>
                 <span class="price">{{ selectedSite.pricePerHour }} SAR</span>
               </div>
               
               <div class="detail-row">
-                <label>Integration Code:</label>
+                <label>{{ 'SITE.INTEGRATION_CODE' | translate }}:</label>
                 <span>{{ selectedSite.integrationCode }}</span>
               </div>
               
               <div class="detail-row">
-                <label>Number of Slots:</label>
+                <label>{{ 'SITE.NUMBER_OF_SLOTS' | translate }}:</label>
                 <span>{{ selectedSite.numberOfSlots }}</span>
               </div>
               
               <div class="detail-row">
-                <label>Polygons:</label>
+                <label>{{ 'SITE.POLYGONS' | translate }}:</label>
                 @if (selectedSite.polygons && selectedSite.polygons.length > 0) {
                   <div class="polygon-list">
                     @for (polygon of selectedSite.polygons; track polygon.id) {
@@ -53,7 +55,7 @@ import { Site } from '../../models/site.model';
                     }
                   </div>
                 } @else {
-                  <span class="polygon-status not-added">■ None Added</span>
+                  <span class="polygon-status not-added">■ {{ 'SITE.NONE_ADDED' | translate }}</span>
                 }
               </div>
             </div>
@@ -62,7 +64,7 @@ import { Site } from '../../models/site.model';
           @if (selectedSite.type === 'leaf') {
             <div class="actions">
               <button class="btn btn-primary" (click)="editSite.emit(selectedSite)">
-                Edit
+                {{ 'COMMON.EDIT' | translate }}
               </button>
             </div>
           }
@@ -70,7 +72,7 @@ import { Site } from '../../models/site.model';
       } @else {
         <div class="no-selection">
           <div class="placeholder-icon">📍</div>
-          <p>Select a site from the tree to view details</p>
+          <p>{{ 'MESSAGES.SELECT_SITE' | translate }}</p>
         </div>
       }
     </div>
@@ -81,4 +83,13 @@ export class SiteDetailsComponent {
   @Input() selectedSite: Site | null = null;
   
   @Output() editSite = new EventEmitter<Site>();
+
+  constructor(private languageService: LanguageService) {}
+
+  getCurrentSiteName(): string {
+    if (!this.selectedSite) return '';
+    
+    const currentLang = this.languageService.getCurrentLanguage();
+    return currentLang === 'ar' ? this.selectedSite.nameAr : this.selectedSite.nameEn;
+  }
 }

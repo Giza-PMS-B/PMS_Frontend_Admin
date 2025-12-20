@@ -1,28 +1,36 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SiteService } from '../../services/site.service';
 import { Site } from '../../models/site.model';
 import { SiteTreeComponent } from '../site-tree/site-tree.component';
 import { SiteDetailsComponent } from '../site-details/site-details.component';
+import { LanguageSwitcherComponent } from '../language-switcher/language-switcher.component';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, SiteTreeComponent, SiteDetailsComponent],
+  imports: [CommonModule, RouterModule, TranslatePipe, SiteTreeComponent, SiteDetailsComponent, LanguageSwitcherComponent],
   template: `
     <div class="admin-dashboard">
       <header class="dashboard-header">
-        <h1>Admin Portal</h1>
-        <button class="add-site-btn" (click)="onAddSite()">
-          <span class="plus-icon">+</span>
-          Add Site
-        </button>
+        <div class="header-left">
+          <img src="assets/logo5.png" alt="Logo" class="logo">
+          <h1>{{ 'ADMIN.PORTAL' | translate }}</h1>
+        </div>
+        <div class="header-right">
+          <app-language-switcher></app-language-switcher>
+          <button class="add-site-btn" (click)="onAddSite()">
+            <span class="plus-icon">+</span>
+            {{ 'ADMIN.ADD_SITE' | translate }}
+          </button>
+        </div>
       </header>
 
       <div class="dashboard-content">
         <div class="left-panel">
-          <h3>Sites Tree</h3>
+          <h3>{{ 'ADMIN.SITES_TREE' | translate }}</h3>
           <app-site-tree 
             [sites]="sites()"
             [selectedSiteId]="selectedSite()?.id || null"
@@ -35,7 +43,7 @@ import { SiteDetailsComponent } from '../site-details/site-details.component';
         </div>
 
         <div class="right-panel">
-          <h3>Details</h3>
+          <h3>{{ 'ADMIN.DETAILS' | translate }}</h3>
           <app-site-details 
             [selectedSite]="selectedSite()"
             (editSite)="onEditSite($event)">

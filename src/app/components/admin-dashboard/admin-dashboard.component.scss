@@ -14,15 +14,31 @@
   align-items: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 
-  h1 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 1.5rem;
-    font-weight: 600;
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    
+    .logo {
+      height: 80px;
+      width: auto;
+      object-fit: contain;
+    }
+    
+    h1 {
+      margin: 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
   }
 }
-
-
 
 .add-site-btn {
   background: #007bff;
@@ -46,8 +62,6 @@
     font-weight: bold;
   }
 }
-
-
 
 .dashboard-content {
   flex: 1;
@@ -97,9 +111,51 @@
   }
 }
 
+// RTL specific styles
+[dir="rtl"] {
+  .dashboard-header {
+    .header-left {
+      text-align: right;
+      flex-direction: row-reverse;
+    }
+    
+    .header-right {
+      flex-direction: row-reverse;
+    }
+  }
+  
+  .add-site-btn {
+    flex-direction: row-reverse;
+  }
+  
+  .left-panel,
+  .right-panel {
+    h3 {
+      text-align: right;
+    }
+  }
+  
+  .message {
+    right: auto;
+    left: 20px;
+    animation: slideInRTL 0.3s ease-out;
+  }
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInRTL {
+  from {
+    transform: translateX(-100%);
     opacity: 0;
   }
   to {
@@ -117,8 +173,14 @@
   .dashboard-header {
     padding: 1rem;
     
-    h1 {
-      font-size: 1.25rem;
+    .header-left {
+      .logo {
+        height: 64px;
+      }
+      
+      h1 {
+        font-size: 1.25rem;
+      }
     }
   }
   
