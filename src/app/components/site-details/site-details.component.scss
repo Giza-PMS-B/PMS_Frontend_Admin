@@ -17,7 +17,7 @@
     font-weight: 600;
     color: #495057;
     min-width: 120px;
-    margin-right: 1rem;
+    margin-inline-end: 1rem;
     font-size: 0.875rem;
   }
   
@@ -164,13 +164,37 @@
   }
 }
 
+// RTL specific styles
+[dir="rtl"] {
+  .detail-row {
+    label {
+      margin-inline-end: 0;
+      margin-inline-start: 1rem;
+      text-align: right;
+    }
+  }
+  
+  .polygon-list {
+    align-items: flex-end;
+    
+    .polygon-name {
+      text-align: right;
+    }
+  }
+  
+  .actions {
+    flex-direction: row-reverse;
+  }
+}
+
 @media (max-width: 768px) {
   .detail-row {
     flex-direction: column;
     
     label {
       min-width: auto;
-      margin-right: 0;
+      margin-inline-end: 0;
+      margin-inline-start: 0;
       margin-bottom: 0.25rem;
     }
   }
@@ -181,5 +205,9 @@
     .btn {
       width: 100%;
     }
+  }
+  
+  [dir="rtl"] .actions {
+    flex-direction: column;
   }
 }

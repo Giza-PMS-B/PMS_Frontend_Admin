@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AsyncValidatorFn } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SiteService } from '../../services/site.service';
 import { Site, CreateSiteRequest } from '../../models/site.model';
 import { CustomValidators } from '../../validators/custom-validators';
@@ -9,17 +10,17 @@ import { CustomValidators } from '../../validators/custom-validators';
 @Component({
   selector: 'app-add-site',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslatePipe],
   template: `
     <div class="add-site-container">
       <div class="form-header">
-        <h2>{{ isEditMode() ? 'Edit Site' : 'Add Site' }}</h2>
+        <h2>{{ isEditMode() ? ('ADMIN.EDIT_SITE' | translate) : ('ADMIN.ADD_SITE' | translate) }}</h2>
         <button class="close-btn" (click)="goBack()">×</button>
       </div>
 
       <form [formGroup]="siteForm" (ngSubmit)="onSubmit()" class="site-form">
         <div class="form-group">
-          <label for="path">Path:</label>
+          <label for="path">{{ 'SITE.PATH' | translate }}:</label>
           <input 
             type="text" 
             id="path" 
@@ -30,7 +31,7 @@ import { CustomValidators } from '../../validators/custom-validators';
 
         <div class="form-row">
           <div class="form-group">
-            <label for="nameEn">Name (EN): <span class="required">*</span></label>
+            <label for="nameEn">{{ 'SITE.NAME_EN' | translate }}: <span class="required">*</span></label>
             <input 
               type="text" 
               id="nameEn" 
@@ -40,23 +41,23 @@ import { CustomValidators } from '../../validators/custom-validators';
             @if (isFieldInvalid('nameEn')) {
               <div class="error-message">
                 @if (siteForm.get('nameEn')?.errors?.['required']) {
-                  <div>• This field is required</div>
+                  <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['minlength'] || siteForm.get('nameEn')?.errors?.['maxlength']) {
-                  <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
+                  <div>• {{ 'VALIDATION.SITE_NAME_LENGTH' | translate }}</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
-                  <div>• Please enter valid input using English letters, and the following special characters: [ - , _ , space, .]</div>
+                  <div>• {{ 'VALIDATION.ENGLISH_TEXT' | translate }}</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
-                  <div>• This name is already in use</div>
+                  <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
                 }
               </div>
             }
           </div>
 
           <div class="form-group">
-            <label for="nameAr">Name (AR): <span class="required">*</span></label>
+            <label for="nameAr">{{ 'SITE.NAME_AR' | translate }}: <span class="required">*</span></label>
             <input 
               type="text" 
               id="nameAr" 
@@ -66,16 +67,16 @@ import { CustomValidators } from '../../validators/custom-validators';
             @if (isFieldInvalid('nameAr')) {
               <div class="error-message">
                 @if (siteForm.get('nameAr')?.errors?.['required']) {
-                  <div>• This field is required</div>
+                  <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['minlength'] || siteForm.get('nameAr')?.errors?.['maxlength']) {
-                  <div>• The site name must contain number of characters in the range 3 to 100 characters</div>
+                  <div>• {{ 'VALIDATION.SITE_NAME_LENGTH' | translate }}</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
-                  <div>• Please enter valid input using Arabic letters, and the following special characters: [ - , _ , space, .]</div>
+                  <div>• {{ 'VALIDATION.ARABIC_TEXT' | translate }}</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
-                  <div>• This name is already in use</div>
+                  <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
                 }
               </div>
             }
@@ -95,7 +96,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         } @else {
           <div class="info-message">
             <div class="info-content">
-              <span class="info-text">This will be created as a Parent Site. To create a Leaf Site, use the "+" button next to a parent site in the tree.</span>
+              <span class="info-text">{{ 'MESSAGES.PARENT_SITE_INFO' | translate }}</span>
             </div>
           </div>
         }
@@ -104,7 +105,7 @@ import { CustomValidators } from '../../validators/custom-validators';
           <div class="leaf-fields">
             <div class="form-row">
               <div class="form-group">
-                <label for="pricePerHour">Price per Hour: <span class="required">*</span></label>
+                <label for="pricePerHour">{{ 'SITE.PRICE_PER_HOUR' | translate }}: <span class="required">*</span></label>
                 <div class="price-input-container">
                   <input 
                     type="text" 
@@ -120,23 +121,23 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (isFieldInvalid('pricePerHour')) {
                   <div class="error-message">
                     @if (siteForm.get('pricePerHour')?.errors?.['required']) {
-                      <div>• This field is required</div>
+                      <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['min']) {
-                      <div>• Price must be greater than 0</div>
+                      <div>• {{ 'VALIDATION.PRICE_MIN' | translate }}</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['max']) {
-                      <div>• Price cannot exceed 999.99</div>
+                      <div>• {{ 'VALIDATION.PRICE_MAX' | translate }}</div>
                     }
                     @if (siteForm.get('pricePerHour')?.errors?.['priceFormat']) {
-                      <div>• Price must have exactly 2 decimal places (e.g., 5.00, 10.50)</div>
+                      <div>• {{ 'VALIDATION.PRICE_FORMAT' | translate }}</div>
                     }
                   </div>
                 }
               </div>
 
               <div class="form-group">
-                <label for="numberOfSlots">Number of Slots: <span class="required">*</span></label>
+                <label for="numberOfSlots">{{ 'SITE.NUMBER_OF_SLOTS' | translate }}: <span class="required">*</span></label>
                 <input 
                   type="number" 
                   id="numberOfSlots" 
@@ -148,10 +149,10 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (isFieldInvalid('numberOfSlots')) {
                   <div class="error-message">
                     @if (siteForm.get('numberOfSlots')?.errors?.['required']) {
-                      <div>• This field is required</div>
+                      <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                     }
                     @if (siteForm.get('numberOfSlots')?.errors?.['min'] || siteForm.get('numberOfSlots')?.errors?.['max']) {
-                      <div>• The number of slots should be in the range of 1 to 10000 slot</div>
+                      <div>• {{ 'VALIDATION.SLOTS_RANGE' | translate }}</div>
                     }
                   </div>
                 }
@@ -159,7 +160,7 @@ import { CustomValidators } from '../../validators/custom-validators';
             </div>
 
             <div class="form-group">
-              <label for="integrationCode">Integration Code: <span class="required">*</span></label>
+              <label for="integrationCode">{{ 'SITE.INTEGRATION_CODE' | translate }}: <span class="required">*</span></label>
               <input 
                 type="text" 
                 id="integrationCode" 
@@ -171,19 +172,19 @@ import { CustomValidators } from '../../validators/custom-validators';
               @if (isFieldInvalid('integrationCode')) {
                 <div class="error-message">
                   @if (siteForm.get('integrationCode')?.errors?.['required']) {
-                    <div>• This field is required</div>
+                    <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['minlength']) {
-                    <div>• The minimum length is 3 characters</div>
+                    <div>• {{ 'VALIDATION.MIN_LENGTH' | translate }}</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['maxlength']) {
-                    <div>• The maximum letters is 100 characters</div>
+                    <div>• {{ 'VALIDATION.MAX_LENGTH' | translate }}</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['integrationCodeFormat']) {
-                    <div>• Please enter a valid format</div>
+                    <div>• {{ 'VALIDATION.INTEGRATION_CODE_FORMAT' | translate }}</div>
                   }
                   @if (siteForm.get('integrationCode')?.errors?.['uniqueIntegrationCode']) {
-                    <div>• Integration Code Already Exists</div>
+                    <div>• {{ 'VALIDATION.INTEGRATION_CODE_EXISTS' | translate }}</div>
                   }
                 </div>
               }
@@ -203,7 +204,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                 <span class="status-value not-added">■ Not Added</span>
               }
               <button type="button" class="add-polygon-btn" (click)="addPolygon()">
-                + Add Polygon
+                + {{ 'POLYGON.ADD_POLYGON' | translate }}
               </button>
             </div>
           </div>
@@ -211,19 +212,19 @@ import { CustomValidators } from '../../validators/custom-validators';
 
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="goBack()">
-            Cancel
+            {{ 'COMMON.CANCEL' | translate }}
           </button>
           <button 
             type="submit" 
             class="btn btn-primary" 
             [disabled]="!isFormReady()">
-            {{ isEditMode() ? 'Update' : 'Save' }}
+            {{ isEditMode() ? ('COMMON.EDIT' | translate) : ('COMMON.SAVE' | translate) }}
           </button>
           
           @if (isLeaf() && !polygonAdded() && siteForm.valid) {
             <div class="save-requirement-message">
               <small class="text-warning">
-                Polygon must be added before saving a leaf site
+                {{ 'MESSAGES.POLYGON_REQUIRED' | translate }}
               </small>
             </div>
           }

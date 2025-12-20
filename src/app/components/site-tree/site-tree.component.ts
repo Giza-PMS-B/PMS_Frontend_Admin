@@ -1,11 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Site } from '../../models/site.model';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-site-tree',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   template: `
     <div class="site-tree">
       @for (site of sites; track site.id) {
@@ -17,11 +19,11 @@ import { Site } from '../../models/site.model';
             <span class="site-icon" [class.leaf]="site.type === 'leaf'">
               {{ site.type === 'leaf' ? '■' : '■' }}
             </span>
-            <span class="site-name">{{ site.nameEn }}</span>
+            <span class="site-name">{{ getSiteName(site) }}</span>
             @if (site.type === 'parent') {
               <button class="add-child-btn" 
                       (click)="onAddChildClick(site, $event)"
-                      title="Add Child Site">
+                      [title]="'ADMIN.ADD_SITE' | translate">
                 +
               </button>
             }
@@ -55,6 +57,13 @@ export class SiteTreeComponent {
   @Output() siteSelected = new EventEmitter<Site>();
   @Output() addChild = new EventEmitter<Site>();
   @Output() nodeToggled = new EventEmitter<string>();
+
+  constructor(private languageService: LanguageService) {}
+
+  getSiteName(site: Site): string {
+    const currentLang = this.languageService.getCurrentLanguage();
+    return currentLang === 'ar' ? site.nameAr : site.nameEn;
+  }
 
   selectSite(site: Site): void {
     this.siteSelected.emit(site);
