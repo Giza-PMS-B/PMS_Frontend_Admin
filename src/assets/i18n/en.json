@@ -82,5 +82,18 @@
     "FILL_REQUIRED_FIELDS": "Fill all required fields",
     "SELECT_SITE": "Select a site from the tree to view details",
     "PARENT_SITE_INFO": "This will be created as a Parent Site. To create a Leaf Site, use the \"+\" button next to a parent site in the tree."
+  },
+  "WELCOME": {
+    "TITLE": "Welcome to Admin Portal",
+    "SUBTITLE": "Parking Management System",
+    "DESCRIPTION": "Manage your parking sites, configure polygons, and monitor your parking infrastructure with our comprehensive admin portal.",
+    "GET_STARTED": "Get Started",
+    "FEATURE_1_TITLE": "Site Management",
+    "FEATURE_1_DESC": "Create and manage parent and leaf parking sites with hierarchical organization.",
+    "FEATURE_2_TITLE": "Polygon Configuration",
+    "FEATURE_2_DESC": "Define precise parking areas using coordinate-based polygon mapping.",
+    "FEATURE_3_TITLE": "Real-time Control",
+    "FEATURE_3_DESC": "Monitor and control your parking infrastructure in real-time.",
+    "FOOTER_TEXT": "© 2024 Parking Management System. All rights reserved."
   }
 }
