@@ -6,11 +6,11 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "pms-admin-frontend"
+        IMAGE_NAME   = "pms-admin-frontend"
         IMAGE_LATEST = "pms-admin-frontend:latest"
-        STACK_NAME = "pms"
+        STACK_NAME   = "pms"
         SERVICE_NAME = "admin-frontend"
-        APP_PORT = "8085"
+        APP_PORT     = "8085"
     }
 
     stages {
@@ -19,9 +19,23 @@ pipeline {
             steps {
                 git(
                     url: 'https://github.com/Giza-PMS-B/PMS_Frontend_Admin.git',
-                    branch: 'main',
+                    branch: 'deploying',
                     credentialsId: 'github-pat-wagih'
                 )
+            }
+        }
+
+        stage('Verify Docker Swarm') {
+            steps {
+                sh '''
+                  STATE=$(docker info --format '{{.Swarm.LocalNodeState}}')
+
+                  if [ "$STATE" != "active" ]; then
+                    echo "ERROR: Docker Swarm is not initialized on this host"
+                    echo "Run: docker swarm init (once, manually)"
+                    exit 1
+                  fi
+                '''
             }
         }
 
@@ -29,14 +43,6 @@ pipeline {
             steps {
                 sh '''
                   docker build -t ${IMAGE_LATEST} .
-                '''
-            }
-        }
-
-        stage('Init Docker Swarm (If Not Initialized)') {
-            steps {
-                sh '''
-                  docker info | grep -q "Swarm: active" || docker swarm init
                 '''
             }
         }
@@ -53,7 +59,7 @@ pipeline {
             steps {
                 sh '''
                   sleep 10
-                  curl -f http://localhost:${APP_PORT} || exit 1
+                  curl -f http://localhost:${APP_PORT}
                 '''
             }
         }
@@ -61,12 +67,10 @@ pipeline {
 
     post {
         success {
-            echo "✅ Admin Frontend deployed using Docker Swarm with 3 replicas & load balancing"
+            echo "✅ Admin Frontend deployed successfully"
         }
-
         failure {
             echo "❌ Deployment failed"
         }
     }
 }
-
