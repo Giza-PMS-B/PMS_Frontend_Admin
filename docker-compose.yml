@@ -2,12 +2,11 @@ version: "3.9"
 
 services:
   admin-frontend:
-    image: pms-admin-frontend:latest
+    image: ${IMAGE_TAG}
     ports:
       - "8085:80"
     networks:
       - pms-net
-
     deploy:
       replicas: 3
       restart_policy:
