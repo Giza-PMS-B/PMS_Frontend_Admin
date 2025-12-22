@@ -117,7 +117,7 @@ export class SiteService {
         pricePerHour: request.pricePerHour || 0,
         integrationCode: request.integrationCode || '',
         numberOfSolts: request.numberOfSlots || 0,
-        polygons: []
+        polygons: request.polygons || []
       };
 
       return this.http.post<any>(`${this.apiUrl}/add/leaf`, leafDto).pipe(

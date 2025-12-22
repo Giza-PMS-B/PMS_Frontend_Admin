@@ -554,30 +554,23 @@ export class AddSiteComponent implements OnInit {
           numberOfSlots: formValue.numberOfSlots
         };
 
+        // If this is a leaf site with polygons, include them in the request
+        if (formValue.isLeaf && this.polygonAdded()) {
+          const polygonsData = this.getStoredPolygonData();
+          if (polygonsData && polygonsData.length > 0) {
+            // Convert polygon data to backend format
+            request.polygons = polygonsData.map(polygon => ({
+              name: polygon.name,
+              points: polygon.coordinates.map(coord => ({
+                latitude: coord.latitude,
+                longitude: coord.longitude
+              }))
+            }));
+          }
+        }
+
         this.siteService.createSite(request).subscribe({
           next: (newSite) => {
-            // If this is a leaf site with polygons, add all polygons to the site
-            if (this.isLeaf() && this.polygonAdded()) {
-              const polygonsData = this.getStoredPolygonData();
-              if (polygonsData && polygonsData.length > 0) {
-                // Create all polygons for the new site
-                polygonsData.forEach((polygonData, index) => {
-                  this.siteService.createPolygon({
-                    name: polygonData.name,
-                    coordinates: polygonData.coordinates,
-                    siteId: newSite.id
-                  }).subscribe({
-                    next: () => {
-                      console.log(`Polygon ${index + 1} attached to site successfully`);
-                    },
-                    error: (error) => {
-                      console.error(`Error attaching polygon ${index + 1} to site:`, error);
-                    }
-                  });
-                });
-              }
-            }
-            
             // Clear saved data after successful submission
             this.clearSavedData();
             this.router.navigate(['/admin']);

@@ -31,11 +31,22 @@ export interface CreateSiteRequest {
   nameAr: string;
   parentId?: string;
   isLeaf: boolean;
-  
+
   // Leaf-specific fields
   pricePerHour?: number;
   integrationCode?: string;
   numberOfSlots?: number;
+  polygons?: CreatePolygonDTO[];
+}
+
+export interface CreatePolygonDTO {
+  name: string;
+  points: CreatePolygonPointDTO[];
+}
+
+export interface CreatePolygonPointDTO {
+  latitude: number;
+  longitude: number;
 }
 
 export interface CreatePolygonRequest {
