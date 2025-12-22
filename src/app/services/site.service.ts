@@ -123,7 +123,7 @@ export class SiteService {
       return this.http.post<any>(`${this.apiUrl}/add/leaf`, leafDto).pipe(
         map(response => this.mapSingleSiteResponse(response.data || response)),
         tap(site => {
-          this.loadRootSites();
+          this.fetchCompleteTree();
         }),
         catchError(error => {
           console.error('Error creating leaf site:', error);
@@ -141,7 +141,7 @@ export class SiteService {
       return this.http.post<any>(`${this.apiUrl}/add/parent`, parentDto).pipe(
         map(response => this.mapSingleSiteResponse(response.data || response)),
         tap(site => {
-          this.loadRootSites();
+          this.fetchCompleteTree();
         }),
         catchError(error => {
           console.error('Error creating parent site:', error);
@@ -246,14 +246,7 @@ export class SiteService {
    * Load root sites from the backend on initialization
    */
   private loadRootSites(): void {
-    this.getSites().subscribe({
-      next: (sites) => {
-        console.log('Root sites loaded:', sites);
-      },
-      error: (error) => {
-        console.error('Error loading root sites:', error);
-      }
-    });
+    this.fetchCompleteTree();
   }
 
   /**
@@ -274,12 +267,60 @@ export class SiteService {
       path: siteDto.path,
       type: siteDto.isLeaf ? 'leaf' : 'parent',
       parentId: siteDto.parentId,
-      children: [],
+      children: siteDto.isLeaf ? undefined : [],
       pricePerHour: siteDto.pricePerHour,
       integrationCode: siteDto.integrationCode,
       numberOfSlots: siteDto.numberOfSolts,
       polygons: siteDto.polygons ? this.mapPolygonResponse(siteDto.polygons) : []
     };
+  }
+
+  /**
+   * Fetch and build complete site tree with all children
+   */
+  fetchCompleteTree(): void {
+    this.http.get<any[]>(`${this.apiUrl}/roots`).pipe(
+      map(sites => this.mapSiteResponseToSite(sites))
+    ).subscribe({
+      next: (rootSites) => {
+        // For each root site, fetch its children recursively
+        const loadPromises = rootSites.map(site => this.fetchChildrenRecursive(site));
+        Promise.all(loadPromises).then(sitesWithChildren => {
+          this.sitesSubject.next(sitesWithChildren);
+        });
+      },
+      error: (error) => {
+        console.error('Error fetching complete tree:', error);
+      }
+    });
+  }
+
+  /**
+   * Recursively fetch children for a site
+   */
+  private fetchChildrenRecursive(site: Site): Promise<Site> {
+    if (site.type === 'leaf') {
+      return Promise.resolve(site);
+    }
+
+    return this.http.get<any[]>(`${this.apiUrl}/children/${site.id}`).pipe(
+      map(children => this.mapSiteResponseToSite(children))
+    ).toPromise().then(children => {
+      if (children && children.length > 0) {
+        return Promise.all(children.map(child => this.fetchChildrenRecursive(child)))
+          .then(childrenWithGrandchildren => {
+            site.children = childrenWithGrandchildren;
+            return site;
+          });
+      } else {
+        site.children = [];
+        return site;
+      }
+    }).catch(error => {
+      console.error(`Error fetching children for site ${site.id}:`, error);
+      site.children = [];
+      return site;
+    });
   }
 
   /**
