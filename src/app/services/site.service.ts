@@ -1,14 +1,19 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, of, BehaviorSubject } from 'rxjs';
+import { Injectable, signal, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, BehaviorSubject, map, tap, catchError } from 'rxjs';
 import { Site, CreateSiteRequest, Polygon, CreatePolygonRequest } from '../models/site.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SiteService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/Site`;
+
   private sitesSubject = new BehaviorSubject<Site[]>([]);
   public sites$ = this.sitesSubject.asObservable();
-  
+
   private selectedSiteSubject = new BehaviorSubject<Site | null>(null);
   public selectedSite$ = this.selectedSiteSubject.asObservable();
 
@@ -49,11 +54,47 @@ export class SiteService {
   ];
 
   constructor() {
-    this.loadSitesFromStorage();
+    this.loadRootSites();
   }
 
+  /**
+   * Get all root sites from the backend
+   */
   getSites(): Observable<Site[]> {
-    return this.sites$;
+    return this.http.get<any[]>(`${this.apiUrl}/roots`).pipe(
+      map(sites => this.mapSiteResponseToSite(sites)),
+      tap(sites => this.sitesSubject.next(sites)),
+      catchError(error => {
+        console.error('Error fetching sites:', error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Get all leaf sites
+   */
+  getLeafSites(): Observable<Site[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/leaves`).pipe(
+      map(sites => this.mapSiteResponseToSite(sites)),
+      catchError(error => {
+        console.error('Error fetching leaf sites:', error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+   * Get children of a specific parent site
+   */
+  getChildSites(parentId: string): Observable<Site[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/children/${parentId}`).pipe(
+      map(sites => this.mapSiteResponseToSite(sites)),
+      catchError(error => {
+        console.error('Error fetching child sites:', error);
+        return of([]);
+      })
+    );
   }
 
   getSiteById(id: string): Observable<Site | undefined> {
@@ -61,29 +102,53 @@ export class SiteService {
     return of(site);
   }
 
+  /**
+   * Create a new site (parent or leaf)
+   */
   createSite(request: CreateSiteRequest): Observable<Site> {
-    const newSite: Site = {
-      id: this.generateId(),
-      nameEn: request.nameEn,
-      nameAr: request.nameAr,
-      path: this.generatePath(request.parentId, request.nameEn),
-      type: request.isLeaf ? 'leaf' : 'parent',
-      parentId: request.parentId,
-      children: request.isLeaf ? undefined : [],
-      pricePerHour: request.pricePerHour,
-      integrationCode: request.integrationCode,
-      numberOfSlots: request.numberOfSlots
-    };
+    const path = this.generatePath(request.parentId, request.nameEn);
 
-    const sites = [...this.sitesSubject.value];
-    if (request.parentId) {
-      this.addChildToParent(sites, request.parentId, newSite);
+    if (request.isLeaf) {
+      const leafDto = {
+        path: path,
+        nameEn: request.nameEn,
+        nameAr: request.nameAr,
+        parentId: request.parentId || null,
+        pricePerHour: request.pricePerHour || 0,
+        integrationCode: request.integrationCode || '',
+        numberOfSolts: request.numberOfSlots || 0,
+        polygons: []
+      };
+
+      return this.http.post<any>(`${this.apiUrl}/add/leaf`, leafDto).pipe(
+        map(response => this.mapSingleSiteResponse(response.data || response)),
+        tap(site => {
+          this.loadRootSites();
+        }),
+        catchError(error => {
+          console.error('Error creating leaf site:', error);
+          throw error;
+        })
+      );
     } else {
-      sites.push(newSite);
-    }
+      const parentDto = {
+        path: path,
+        nameEn: request.nameEn,
+        nameAr: request.nameAr,
+        parentId: request.parentId || null
+      };
 
-    this.updateSitesData(sites);
-    return of(newSite);
+      return this.http.post<any>(`${this.apiUrl}/add/parent`, parentDto).pipe(
+        map(response => this.mapSingleSiteResponse(response.data || response)),
+        tap(site => {
+          this.loadRootSites();
+        }),
+        catchError(error => {
+          console.error('Error creating parent site:', error);
+          throw error;
+        })
+      );
+    }
   }
 
   updateSite(id: string, updates: Partial<Site>): Observable<Site> {
@@ -177,23 +242,59 @@ export class SiteService {
     return Math.random().toString(36).substr(2, 9);
   }
 
-  private loadSitesFromStorage(): void {
-    try {
-      const storedSites = localStorage.getItem(this.STORAGE_KEY);
-      if (storedSites) {
-        const sites = JSON.parse(storedSites);
-        this.sitesSubject.next(sites);
-      } else {
-        // First time loading, use mock data and save it
-        this.sitesSubject.next(this.mockSites);
-        this.saveSitesToStorage(this.mockSites);
+  /**
+   * Load root sites from the backend on initialization
+   */
+  private loadRootSites(): void {
+    this.getSites().subscribe({
+      next: (sites) => {
+        console.log('Root sites loaded:', sites);
+      },
+      error: (error) => {
+        console.error('Error loading root sites:', error);
       }
-    } catch (error) {
-      console.error('Error loading sites from storage:', error);
-      // Fallback to mock data
-      this.sitesSubject.next(this.mockSites);
-      this.saveSitesToStorage(this.mockSites);
-    }
+    });
+  }
+
+  /**
+   * Map backend site response to frontend Site model
+   */
+  private mapSiteResponseToSite(sites: any[]): Site[] {
+    return sites.map(site => this.mapSingleSiteResponse(site));
+  }
+
+  /**
+   * Map single backend site response to frontend Site model
+   */
+  private mapSingleSiteResponse(siteDto: any): Site {
+    return {
+      id: siteDto.id,
+      nameEn: siteDto.nameEn,
+      nameAr: siteDto.nameAr,
+      path: siteDto.path,
+      type: siteDto.isLeaf ? 'leaf' : 'parent',
+      parentId: siteDto.parentId,
+      children: [],
+      pricePerHour: siteDto.pricePerHour,
+      integrationCode: siteDto.integrationCode,
+      numberOfSlots: siteDto.numberOfSolts,
+      polygons: siteDto.polygons ? this.mapPolygonResponse(siteDto.polygons) : []
+    };
+  }
+
+  /**
+   * Map backend polygon response to frontend Polygon model
+   */
+  private mapPolygonResponse(polygons: any[]): Polygon[] {
+    return polygons.map(polygon => ({
+      id: polygon.id,
+      name: polygon.name,
+      siteId: polygon.siteId,
+      coordinates: polygon.polygonPoints?.map((point: any) => ({
+        latitude: point.latitude,
+        longitude: point.longitude
+      })) || []
+    }));
   }
 
   private updateSitesData(sites: Site[]): void {
