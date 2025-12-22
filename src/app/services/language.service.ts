@@ -53,26 +53,36 @@ export class LanguageService {
    * @returns Translated message or original message if no translation found
    */
   translateBackendError(backendMessage: string): string {
-    // Map of backend error messages to translation keys
+    // Log the original message for debugging
+    console.log(`Original backend error message: "${backendMessage}"`);
+    
+    // Normalize the message by trimming whitespace and converting to lowercase for comparison
+    const normalizedMessage = backendMessage.trim().toLowerCase();
+    console.log(`Normalized message: "${normalizedMessage}"`);
+    
+    // Map of backend error messages to translation keys (using lowercase for comparison)
     const errorMappings: { [key: string]: string } = {
-      'The site name is already existed': 'VALIDATION.SITE_NAME_EXISTS',
+      'the site name is already existed': 'VALIDATION.SITE_NAME_EXISTS',
       'integration code already existed': 'VALIDATION.INTEGRATION_CODE_ALREADY_EXISTS',
-      'Integration code already existed': 'VALIDATION.INTEGRATION_CODE_ALREADY_EXISTS',
-      'Site name already exists': 'VALIDATION.SITE_NAME_EXISTS',
-      'Integration Code Already Exists': 'VALIDATION.INTEGRATION_CODE_EXISTS',
-      'These Values are already exists': 'VALIDATION.VALUES_ALREADY_EXISTS' // Backend sends this for both site name and integration code
+      'site name already exists': 'VALIDATION.SITE_NAME_EXISTS',
+      'integration code already exists': 'VALIDATION.INTEGRATION_CODE_EXISTS',
+      'these values are already exists': 'VALIDATION.VALUES_ALREADY_EXISTS',
+      'these values are already exist': 'VALIDATION.VALUES_ALREADY_EXISTS', // Handle grammar variations
+      'values are already exists': 'VALIDATION.VALUES_ALREADY_EXISTS',
+      'values already exist': 'VALIDATION.VALUES_ALREADY_EXISTS'
     };
 
     // Check if we have a translation for this error message
-    const translationKey = errorMappings[backendMessage];
+    const translationKey = errorMappings[normalizedMessage];
     if (translationKey) {
       const translatedMessage = this.translate.instant(translationKey);
-      console.log(`Backend error translated: "${backendMessage}" -> "${translatedMessage}"`);
+      console.log(`Backend error translated: "${backendMessage}" -> "${translatedMessage}" (using key: ${translationKey})`);
       return translatedMessage;
     }
 
     // Log unmatched messages for debugging
-    console.log(`Unmatched backend error message: "${backendMessage}"`);
+    console.log(`Unmatched backend error message: "${backendMessage}" (normalized: "${normalizedMessage}")`);
+    console.log('Available mappings:', Object.keys(errorMappings));
     
     // Return original message if no translation found
     return backendMessage;
