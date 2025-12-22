@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AsyncValidatorFn } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -255,7 +255,7 @@ import { CustomValidators } from '../../validators/custom-validators';
   `,
   styleUrl: './add-site.component.scss'
 })
-export class AddSiteComponent implements OnInit {
+export class AddSiteComponent implements OnInit, OnDestroy {
   siteForm: FormGroup;
   parentSite = signal<Site | null>(null);
   isLeaf = signal<boolean>(false);
@@ -287,6 +287,12 @@ export class AddSiteComponent implements OnInit {
     const polygonAdded = this.route.snapshot.queryParams['polygonAdded'];
 
     console.log('ngOnInit - parentId:', parentId, 'siteId:', siteId, 'mode:', mode, 'polygonAdded:', polygonAdded);
+
+    // Clear saved data if starting fresh (no specific context parameters)
+    if (!parentId && !siteId && !mode && !polygonAdded) {
+      console.log('Starting fresh - clearing any existing form data');
+      this.clearSavedData();
+    }
 
     // Check if this is edit mode
     if (mode === 'edit' && siteId) {
@@ -344,6 +350,15 @@ export class AddSiteComponent implements OnInit {
     this.siteForm.get('nameEn')?.valueChanges.subscribe(() => {
       this.updateGeneratedPath();
     });
+  }
+
+  ngOnDestroy(): void {
+    // Clear form data when component is destroyed (navigating away)
+    // Only clear if we're not in edit mode and haven't successfully saved
+    if (!this.isEditMode() && !this.showSuccess()) {
+      console.log('Component destroyed - clearing unsaved form data');
+      this.clearSavedData();
+    }
   }
 
   private createForm(): FormGroup {

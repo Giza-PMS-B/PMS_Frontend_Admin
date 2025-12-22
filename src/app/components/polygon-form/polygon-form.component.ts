@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -193,7 +193,7 @@ import { CustomValidators } from '../../validators/custom-validators';
   `,
   styleUrl: './polygon-form.component.scss'
 })
-export class PolygonFormComponent implements OnInit {
+export class PolygonFormComponent implements OnInit, OnDestroy {
   polygonForm: FormGroup;
   siteId = signal<string>('');
   isEdit = signal<boolean>(false);
@@ -228,6 +228,20 @@ export class PolygonFormComponent implements OnInit {
     } else {
       // Add initial coordinate at (0, 0) for new polygons
       this.addCoordinate();
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Clear temporary polygon data when navigating away without saving
+    // Only clear if we haven't successfully saved (showMessage indicates success)
+    if (!this.showMessage()) {
+      console.log('Polygon form destroyed - clearing unsaved temporary data');
+      // Don't clear tempPolygonData here as it might be needed by add-site form
+      // Only clear if we're completely abandoning the flow
+      const returnTo = this.route.snapshot.queryParams['returnTo'];
+      if (!returnTo || returnTo === 'admin') {
+        localStorage.removeItem('tempPolygonData');
+      }
     }
   }
 
@@ -570,6 +584,15 @@ export class PolygonFormComponent implements OnInit {
   }
 
   goBack(): void {
+    // Clear temporary data when explicitly going back/canceling
+    if (!this.showMessage()) {
+      console.log('Explicitly going back from polygon form - clearing temporary data');
+      const returnTo = this.route.snapshot.queryParams['returnTo'];
+      if (!returnTo || returnTo === 'admin') {
+        localStorage.removeItem('tempPolygonData');
+      }
+    }
+
     const returnTo = this.route.snapshot.queryParams['returnTo'];
     if (returnTo === 'add-site') {
       // Return to add-site form without polygon
