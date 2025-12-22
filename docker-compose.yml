@@ -14,4 +14,4 @@ services:
 
 networks:
   pms-net:
-    driver: overlay
+    external: true
