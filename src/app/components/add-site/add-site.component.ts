@@ -269,6 +269,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   showError = signal<boolean>(false);
   successMessage = signal<string>('');
   showSuccess = signal<boolean>(false);
+  private navigatingToPolygon = false;
 
   constructor(
     private fb: FormBuilder,
@@ -285,13 +286,17 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     const siteId = this.route.snapshot.queryParams['siteId'];
     const mode = this.route.snapshot.queryParams['mode'];
     const polygonAdded = this.route.snapshot.queryParams['polygonAdded'];
+    const returnFrom = this.route.snapshot.queryParams['returnFrom'];
 
-    console.log('ngOnInit - parentId:', parentId, 'siteId:', siteId, 'mode:', mode, 'polygonAdded:', polygonAdded);
+    console.log('ngOnInit - parentId:', parentId, 'siteId:', siteId, 'mode:', mode, 'polygonAdded:', polygonAdded, 'returnFrom:', returnFrom);
 
     // Clear saved data if starting fresh (no specific context parameters)
-    if (!parentId && !siteId && !mode && !polygonAdded) {
+    // Don't clear if returning from polygon form
+    if (!parentId && !siteId && !mode && !polygonAdded && !returnFrom) {
       console.log('Starting fresh - clearing any existing form data');
       this.clearSavedData();
+    } else {
+      console.log('Not starting fresh - preserving existing form data');
     }
 
     // Check if this is edit mode
@@ -355,9 +360,12 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Clear form data when component is destroyed (navigating away)
     // Only clear if we're not in edit mode and haven't successfully saved
-    if (!this.isEditMode() && !this.showSuccess()) {
+    // AND we're not navigating to the polygon form (which is part of the same workflow)
+    if (!this.isEditMode() && !this.showSuccess() && !this.navigatingToPolygon) {
       console.log('Component destroyed - clearing unsaved form data');
       this.clearSavedData();
+    } else if (this.navigatingToPolygon) {
+      console.log('Component destroyed - preserving data for polygon form navigation');
     }
   }
 
@@ -556,6 +564,9 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   addPolygon(): void {
     // Save current form data (this will be automatically saved by the valueChanges subscription)
     this.saveFormData();
+    
+    // Set flag to indicate we're navigating to polygon form
+    this.navigatingToPolygon = true;
     
     // Navigate to polygon form
     const siteId = this.isEditMode() ? this.editingSite()?.id || 'temp-site-id' : 'temp-site-id';
