@@ -31,7 +31,8 @@
     "NUMBER_OF_SLOTS": "Number of Slots",
     "POLYGONS": "Polygons",
     "NONE_ADDED": "None Added",
-    "ADDED": "Added"
+    "ADDED": "Added",
+    "LEAF_TOGGLE": "Leaf Toggle"
   },
   "POLYGON": {
     "ADD_POLYGON": "Add Polygon",
@@ -69,6 +70,7 @@
     "INTEGRATION_CODE_EXISTS": "Integration Code Already Exists",
     "SITE_NAME_EXISTS": "The site name is already existed",
     "INTEGRATION_CODE_ALREADY_EXISTS": "Integration code already existed",
+    "VALUES_ALREADY_EXISTS": "These values are already in use",
     "UNIQUE_NAME": "This name is already in use",
     "UNIQUE_POLYGON": "This polygon name is already in use",
     "LATITUDE_RANGE": "Range: -90 to +90",

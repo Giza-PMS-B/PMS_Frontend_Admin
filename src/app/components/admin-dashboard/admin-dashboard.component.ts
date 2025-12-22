@@ -45,8 +45,7 @@ import { LanguageSwitcherComponent } from '../language-switcher/language-switche
         <div class="right-panel">
           <h3>{{ 'ADMIN.DETAILS' | translate }}</h3>
           <app-site-details 
-            [selectedSite]="selectedSite()"
-            (editSite)="onEditSite($event)">
+            [selectedSite]="selectedSite()">
           </app-site-details>
         </div>
       </div>
@@ -105,16 +104,6 @@ export class AdminDashboardComponent implements OnInit {
       queryParams: { parentId: parentSite.id } 
     });
   }
-
-  onEditSite(site: Site): void {
-    this.router.navigate(['/admin/add-site'], { 
-      queryParams: { siteId: site.id, mode: 'edit' } 
-    });
-  }
-
-
-
-
 
   onNodeToggled(nodeId: string): void {
     const newExpandedNodes = new Set(this.expandedNodes());

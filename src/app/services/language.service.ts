@@ -59,15 +59,21 @@ export class LanguageService {
       'integration code already existed': 'VALIDATION.INTEGRATION_CODE_ALREADY_EXISTS',
       'Integration code already existed': 'VALIDATION.INTEGRATION_CODE_ALREADY_EXISTS',
       'Site name already exists': 'VALIDATION.SITE_NAME_EXISTS',
-      'Integration Code Already Exists': 'VALIDATION.INTEGRATION_CODE_EXISTS'
+      'Integration Code Already Exists': 'VALIDATION.INTEGRATION_CODE_EXISTS',
+      'These Values are already exists': 'VALIDATION.VALUES_ALREADY_EXISTS' // Backend sends this for both site name and integration code
     };
 
     // Check if we have a translation for this error message
     const translationKey = errorMappings[backendMessage];
     if (translationKey) {
-      return this.translate.instant(translationKey);
+      const translatedMessage = this.translate.instant(translationKey);
+      console.log(`Backend error translated: "${backendMessage}" -> "${translatedMessage}"`);
+      return translatedMessage;
     }
 
+    // Log unmatched messages for debugging
+    console.log(`Unmatched backend error message: "${backendMessage}"`);
+    
     // Return original message if no translation found
     return backendMessage;
   }
