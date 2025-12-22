@@ -595,8 +595,11 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
 
     const returnTo = this.route.snapshot.queryParams['returnTo'];
     if (returnTo === 'add-site') {
-      // Return to add-site form without polygon
-      this.router.navigate(['/admin/add-site']);
+      // Return to add-site form - add parameter to indicate we're returning from polygon
+      console.log('Returning to add-site form from polygon form');
+      this.router.navigate(['/admin/add-site'], {
+        queryParams: { returnFrom: 'polygon' }
+      });
     } else if (returnTo === 'edit-site') {
       // Return to edit form
       const siteId = this.siteId();
