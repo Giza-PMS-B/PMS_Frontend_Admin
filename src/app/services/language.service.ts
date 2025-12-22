@@ -46,4 +46,29 @@ export class LanguageService {
       { code: 'ar', name: 'Arabic', nativeName: 'العربية' }
     ];
   }
+
+  /**
+   * Translate backend error messages to appropriate translation keys
+   * @param backendMessage - The error message from backend
+   * @returns Translated message or original message if no translation found
+   */
+  translateBackendError(backendMessage: string): string {
+    // Map of backend error messages to translation keys
+    const errorMappings: { [key: string]: string } = {
+      'The site name is already existed': 'VALIDATION.SITE_NAME_EXISTS',
+      'integration code already existed': 'VALIDATION.INTEGRATION_CODE_ALREADY_EXISTS',
+      'Integration code already existed': 'VALIDATION.INTEGRATION_CODE_ALREADY_EXISTS',
+      'Site name already exists': 'VALIDATION.SITE_NAME_EXISTS',
+      'Integration Code Already Exists': 'VALIDATION.INTEGRATION_CODE_EXISTS'
+    };
+
+    // Check if we have a translation for this error message
+    const translationKey = errorMappings[backendMessage];
+    if (translationKey) {
+      return this.translate.instant(translationKey);
+    }
+
+    // Return original message if no translation found
+    return backendMessage;
+  }
 }

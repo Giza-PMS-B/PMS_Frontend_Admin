@@ -67,6 +67,8 @@
     "INTEGER_ONLY": "Please enter integer only",
     "INTEGRATION_CODE_FORMAT": "Please enter a valid format",
     "INTEGRATION_CODE_EXISTS": "Integration Code Already Exists",
+    "SITE_NAME_EXISTS": "The site name is already existed",
+    "INTEGRATION_CODE_ALREADY_EXISTS": "Integration code already existed",
     "UNIQUE_NAME": "This name is already in use",
     "UNIQUE_POLYGON": "This polygon name is already in use",
     "LATITUDE_RANGE": "Range: -90 to +90",
