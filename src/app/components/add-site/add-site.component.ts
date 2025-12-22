@@ -116,7 +116,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                     (blur)="onPriceBlur($event)"
                     class="form-control price-input"
                     [class.error]="isFieldInvalid('pricePerHour')"
-                    placeholder="0.00">
+                    placeholder="0">
                   <span class="currency-suffix">SAR</span>
                 </div>
                 @if (isFieldInvalid('pricePerHour')) {
@@ -246,7 +246,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         @if (showSuccess()) {
           <div class="alert alert-success">
             <span class="success-icon">✓</span>
-            <span class="success-text">{{ successMessage() }}</span>
+            <span class="success-text">{{ successMessage() | translate }}</span>
             <button class="close-success" (click)="dismissSuccess()">×</button>
           </div>
         }
@@ -518,9 +518,20 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     let value = input.value;
     
     if (value && !isNaN(parseFloat(value))) {
-      // Format to exactly 2 decimal places
+      // Keep the original format if it's valid (don't force 2 decimal places)
       const numValue = parseFloat(value);
-      const formattedValue = numValue.toFixed(2);
+      
+      // Only format if the value has more than 2 decimal places
+      const decimalPlaces = (value.toString().split('.')[1] || '').length;
+      let formattedValue = value;
+      
+      if (decimalPlaces > 2) {
+        // Round to 2 decimal places if more than 2 decimals
+        formattedValue = numValue.toFixed(2);
+      } else {
+        // Keep original format (integer, 1 decimal, or 2 decimals)
+        formattedValue = numValue.toString();
+      }
       
       // Update both input and form control
       input.value = formattedValue;

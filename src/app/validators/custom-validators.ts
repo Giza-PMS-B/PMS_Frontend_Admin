@@ -102,7 +102,7 @@ export class CustomValidators {
     };
   }
 
-  // Price format validator (exactly 2 decimal places required)
+  // Price format validator (up to 2 decimal places allowed)
   static priceFormat(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
       if (!control.value && control.value !== 0) {
@@ -117,8 +117,8 @@ export class CustomValidators {
         return { priceFormat: { value: control.value } };
       }
       
-      // Must have exactly 2 decimal places (e.g., 5.00, 10.50, not 5 or 5.5)
-      const pattern = /^\d+\.\d{2}$/;
+      // Allow integers and numbers with up to 2 decimal places (e.g., 5, 5.5, 5.50)
+      const pattern = /^\d+(\.\d{1,2})?$/;
       return pattern.test(value) ? null : { priceFormat: { value: control.value } };
     };
   }

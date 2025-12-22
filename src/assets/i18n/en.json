@@ -61,7 +61,7 @@
     "ENGLISH_TEXT": "Please enter valid input using English letters, and the following special characters: [ - , _ , space, .]",
     "ARABIC_TEXT": "Please enter valid input using Arabic letters, and the following special characters: [ - , _ , space, .]",
     "MIXED_TEXT": "Please enter valid input using Arabic/English letters, and the following special characters: [ - , _ , space, .]",
-    "PRICE_FORMAT": "Price must have exactly 2 decimal places (e.g., 5.00, 10.50)",
+    "PRICE_FORMAT": "Price must have up to 2 decimal places (e.g., 5, 5.5, 5.50)",
     "PRICE_MIN": "Price must be greater than 0",
     "PRICE_MAX": "Price cannot exceed 999.99",
     "SLOTS_RANGE": "The number of slots should be in the range of 1 to 10000 slot",
