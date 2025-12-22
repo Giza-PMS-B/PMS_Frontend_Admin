@@ -229,6 +229,14 @@ import { CustomValidators } from '../../validators/custom-validators';
             </div>
           }
         </div>
+
+        @if (showError()) {
+          <div class="alert alert-error">
+            <span class="error-icon">⚠</span>
+            <span class="error-text">{{ errorMessage() }}</span>
+            <button class="close-error" (click)="dismissError()">×</button>
+          </div>
+        }
       </form>
     </div>
   `,
@@ -244,6 +252,8 @@ export class AddSiteComponent implements OnInit {
   polygonNames = signal<string[]>([]);
   isEditMode = signal<boolean>(false);
   editingSite = signal<Site | null>(null);
+  errorMessage = signal<string>('');
+  showError = signal<boolean>(false);
 
   constructor(
     private fb: FormBuilder,
@@ -540,6 +550,7 @@ export class AddSiteComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error updating site:', error);
+            this.displayError(error);
           }
         });
       } else {
@@ -577,6 +588,7 @@ export class AddSiteComponent implements OnInit {
           },
           error: (error) => {
             console.error('Error creating site:', error);
+            this.displayError(error);
           }
         });
       }
@@ -760,5 +772,43 @@ export class AddSiteComponent implements OnInit {
   goBack(): void {
     this.clearSavedData();
     this.router.navigate(['/admin']);
+  }
+
+  /**
+   * Display error message from backend response
+   */
+  private displayError(error: any): void {
+    let message = 'An error occurred. Please try again.';
+
+    if (error?.error) {
+      // Check for different error response formats
+      if (typeof error.error === 'string') {
+        message = error.error;
+      } else if (error.error.error) {
+        message = error.error.error;
+      } else if (error.error.message) {
+        message = error.error.message;
+      } else if (error.error.details) {
+        message = error.error.details;
+      }
+    } else if (error?.message) {
+      message = error.message;
+    }
+
+    this.errorMessage.set(message);
+    this.showError.set(true);
+
+    // Auto-hide error after 5 seconds
+    setTimeout(() => {
+      this.dismissError();
+    }, 5000);
+  }
+
+  /**
+   * Dismiss error message
+   */
+  dismissError(): void {
+    this.showError.set(false);
+    this.errorMessage.set('');
   }
 }
