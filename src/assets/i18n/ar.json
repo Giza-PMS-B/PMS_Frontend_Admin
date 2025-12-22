@@ -67,6 +67,8 @@
     "INTEGER_ONLY": "يرجى إدخال عدد صحيح فقط",
     "INTEGRATION_CODE_FORMAT": "يرجى إدخال تنسيق صحيح",
     "INTEGRATION_CODE_EXISTS": "كود الربط موجود بالفعل",
+    "SITE_NAME_EXISTS": "اسم الموقع موجود بالفعل",
+    "INTEGRATION_CODE_ALREADY_EXISTS": "كود الربط موجود بالفعل",
     "UNIQUE_NAME": "هذا الاسم مستخدم بالفعل",
     "UNIQUE_POLYGON": "اسم المضلع مستخدم بالفعل",
     "LATITUDE_RANGE": "النطاق: -90 إلى +90",

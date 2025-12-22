@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } fr
 import { Router, ActivatedRoute } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SiteService } from '../../services/site.service';
+import { LanguageService } from '../../services/language.service';
 import { Coordinate, CreatePolygonRequest } from '../../models/site.model';
 import { CustomValidators } from '../../validators/custom-validators';
 
@@ -206,7 +207,8 @@ export class PolygonFormComponent implements OnInit {
     private fb: FormBuilder,
     private siteService: SiteService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private languageService: LanguageService
   ) {
     this.polygonForm = this.createForm();
   }
@@ -383,7 +385,9 @@ export class PolygonFormComponent implements OnInit {
       message = error.message;
     }
 
-    this.errorMessage.set(message);
+    // Translate backend error message if available
+    const translatedMessage = this.languageService.translateBackendError(message);
+    this.errorMessage.set(translatedMessage);
     this.showErrorMessage.set(true);
 
     // Hide error message after 5 seconds

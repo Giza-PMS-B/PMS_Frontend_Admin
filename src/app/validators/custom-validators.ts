@@ -45,10 +45,18 @@ export class CustomValidators {
       if (!control.value) {
         return null;
       }
-      
+
+      const value = control.value.trim();
+
+      // Check if empty after trimming or doesn't contain at least one Arabic letter
+      const hasArabicLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(value);
+      if (!value || !hasArabicLetter) {
+        return { arabicText: { value: control.value } };
+      }
+
       // Arabic characters, numbers, and only specific special characters: - _ space .
       const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9\s\-_.]+$/;
-      return pattern.test(control.value) ? null : { arabicText: { value: control.value } };
+      return pattern.test(value) ? null : { arabicText: { value: control.value } };
     };
   }
 
@@ -58,10 +66,18 @@ export class CustomValidators {
       if (!control.value) {
         return null;
       }
-      
+
+      const value = control.value.trim();
+
+      // Check if empty after trimming or doesn't contain at least one English letter
+      const hasEnglishLetter = /[a-zA-Z]/.test(value);
+      if (!value || !hasEnglishLetter) {
+        return { englishText: { value: control.value } };
+      }
+
       // English letters, numbers, and only specific special characters: - _ space .
       const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
-      return pattern.test(control.value) ? null : { englishText: { value: control.value } };
+      return pattern.test(value) ? null : { englishText: { value: control.value } };
     };
   }
 
@@ -71,10 +87,18 @@ export class CustomValidators {
       if (!control.value) {
         return null;
       }
-      
+
+      const value = control.value.trim();
+
+      // Check if empty after trimming or doesn't contain at least one alphanumeric character
+      const hasAlphanumeric = /[a-zA-Z0-9]/.test(value);
+      if (!value || !hasAlphanumeric) {
+        return { integrationCodeFormat: { value: control.value } };
+      }
+
       // Accepts letters, numbers, and only specific special characters: - _ space .
       const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
-      return pattern.test(control.value) ? null : { integrationCodeFormat: { value: control.value } };
+      return pattern.test(value) ? null : { integrationCodeFormat: { value: control.value } };
     };
   }
 
@@ -157,10 +181,18 @@ export class CustomValidators {
       if (!control.value) {
         return null;
       }
-      
+
+      const value = control.value.trim();
+
+      // Check if empty after trimming or doesn't contain at least one letter (Arabic or English)
+      const hasLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z]/.test(value);
+      if (!value || !hasLetter) {
+        return { mixedText: { value: control.value } };
+      }
+
       // Arabic and English characters, numbers, and only specific special characters: - _ space .
       const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9\s\-_.]+$/;
-      return pattern.test(control.value) ? null : { mixedText: { value: control.value } };
+      return pattern.test(value) ? null : { mixedText: { value: control.value } };
     };
   }
 
