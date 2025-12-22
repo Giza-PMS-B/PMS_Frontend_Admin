@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Site } from '../../models/site.model';
@@ -60,14 +60,6 @@ import { LanguageService } from '../../services/language.service';
               </div>
             </div>
           }
-
-          @if (selectedSite.type === 'leaf') {
-            <div class="actions">
-              <button class="btn btn-primary" (click)="editSite.emit(selectedSite)">
-                {{ 'COMMON.EDIT' | translate }}
-              </button>
-            </div>
-          }
         </div>
       } @else {
         <div class="no-selection">
@@ -81,8 +73,6 @@ import { LanguageService } from '../../services/language.service';
 })
 export class SiteDetailsComponent {
   @Input() selectedSite: Site | null = null;
-  
-  @Output() editSite = new EventEmitter<Site>();
 
   constructor(private languageService: LanguageService) {}
 

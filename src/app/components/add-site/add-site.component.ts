@@ -91,7 +91,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                 type="checkbox"
                 formControlName="isLeaf"
                 (change)="onLeafToggleChange()">
-              <span class="toggle-text">Leaf Toggle</span>
+              <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
             </label>
           </div>
         } @else {
@@ -198,7 +198,7 @@ import { CustomValidators } from '../../validators/custom-validators';
 
 
             <div class="polygon-status">
-              <span class="status-label">Polygons:</span>
+              <span class="status-label">{{ 'SITE.POLYGONS' | translate }}:</span>
               @if (polygonAdded()) {
                 <div class="polygon-list">
                   @for (polygonName of polygonNames(); track $index) {

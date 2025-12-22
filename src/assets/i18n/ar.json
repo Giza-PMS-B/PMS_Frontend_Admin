@@ -31,7 +31,8 @@
     "NUMBER_OF_SLOTS": "عدد الأماكن",
     "POLYGONS": "المضلعات",
     "NONE_ADDED": "لم يتم الإضافة",
-    "ADDED": "تم الإضافة"
+    "ADDED": "تم الإضافة",
+    "LEAF_TOGGLE": "تبديل الفرعي"
   },
   "POLYGON": {
     "ADD_POLYGON": "إضافة مضلع",
@@ -69,6 +70,7 @@
     "INTEGRATION_CODE_EXISTS": "كود الربط موجود بالفعل",
     "SITE_NAME_EXISTS": "اسم الموقع موجود بالفعل",
     "INTEGRATION_CODE_ALREADY_EXISTS": "كود الربط موجود بالفعل",
+    "VALUES_ALREADY_EXISTS": "هذه القيم مستخدمة بالفعل",
     "UNIQUE_NAME": "هذا الاسم مستخدم بالفعل",
     "UNIQUE_POLYGON": "اسم المضلع مستخدم بالفعل",
     "LATITUDE_RANGE": "النطاق: -90 إلى +90",
