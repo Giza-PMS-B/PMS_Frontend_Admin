@@ -70,7 +70,7 @@
     "INTEGRATION_CODE_EXISTS": "كود الربط موجود بالفعل",
     "SITE_NAME_EXISTS": "اسم الموقع موجود بالفعل",
     "INTEGRATION_CODE_ALREADY_EXISTS": "كود الربط موجود بالفعل",
-    "VALUES_ALREADY_EXISTS": "هذه القيم مستخدمة بالفعل",
+    "VALUES_ALREADY_EXISTS": "هذه البيانات موجودة بالفعل",
     "UNIQUE_NAME": "هذا الاسم مستخدم بالفعل",
     "UNIQUE_POLYGON": "اسم المضلع مستخدم بالفعل",
     "LATITUDE_RANGE": "النطاق: -90 إلى +90",
