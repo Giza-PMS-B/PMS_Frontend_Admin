@@ -6,12 +6,12 @@ services:
     ports:
       - "8085:80"
     networks:
-      - pms-net
+      - pms-network
     deploy:
       replicas: 3
       restart_policy:
         condition: on-failure
 
 networks:
-  pms-net:
+  pms-network:
     external: true
