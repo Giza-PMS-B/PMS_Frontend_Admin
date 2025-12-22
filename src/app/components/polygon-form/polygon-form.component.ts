@@ -332,7 +332,7 @@ export class PolygonFormComponent implements OnInit {
           },
           error: (error) => {
             console.error(`Error ${this.isEdit() ? 'updating' : 'creating'} polygon:`, error);
-            alert(`Error ${this.isEdit() ? 'updating' : 'saving'} polygon. Please try again.`);
+            this.displayBackendError(error);
           }
         });
       }
@@ -345,11 +345,41 @@ export class PolygonFormComponent implements OnInit {
   private showValidationError(message: string): void {
     this.errorMessage.set('MESSAGES.FILL_REQUIRED_FIELDS');
     this.showErrorMessage.set(true);
-    
+
     // Hide error message after 3 seconds
     setTimeout(() => {
       this.showErrorMessage.set(false);
     }, 3000);
+  }
+
+  /**
+   * Display backend error message
+   */
+  private displayBackendError(error: any): void {
+    let message = 'An error occurred. Please try again.';
+
+    if (error?.error) {
+      // Check for different error response formats
+      if (typeof error.error === 'string') {
+        message = error.error;
+      } else if (error.error.error) {
+        message = error.error.error;
+      } else if (error.error.message) {
+        message = error.error.message;
+      } else if (error.error.details) {
+        message = error.error.details;
+      }
+    } else if (error?.message) {
+      message = error.message;
+    }
+
+    this.errorMessage.set(message);
+    this.showErrorMessage.set(true);
+
+    // Hide error message after 5 seconds
+    setTimeout(() => {
+      this.showErrorMessage.set(false);
+    }, 5000);
   }
 
   getMapX(longitude: number): number {
