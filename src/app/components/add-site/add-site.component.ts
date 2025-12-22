@@ -138,12 +138,13 @@ import { CustomValidators } from '../../validators/custom-validators';
 
               <div class="form-group">
                 <label for="numberOfSlots">{{ 'SITE.NUMBER_OF_SLOTS' | translate }}: <span class="required">*</span></label>
-                <input 
-                  type="number" 
-                  id="numberOfSlots" 
-                  formControlName="numberOfSlots" 
-                  min="1" 
+                <input
+                  type="number"
+                  id="numberOfSlots"
+                  formControlName="numberOfSlots"
+                  min="1"
                   max="10000"
+                  step="1"
                   class="form-control"
                   [class.error]="isFieldInvalid('numberOfSlots')">
                 @if (isFieldInvalid('numberOfSlots')) {
@@ -153,6 +154,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                     }
                     @if (siteForm.get('numberOfSlots')?.errors?.['min'] || siteForm.get('numberOfSlots')?.errors?.['max']) {
                       <div>• {{ 'VALIDATION.SLOTS_RANGE' | translate }}</div>
+                    }
+                    @if (siteForm.get('numberOfSlots')?.errors?.['integer']) {
+                      <div>• {{ 'VALIDATION.INTEGER_ONLY' | translate }}</div>
                     }
                   </div>
                 }
@@ -237,6 +241,14 @@ import { CustomValidators } from '../../validators/custom-validators';
             <button class="close-error" (click)="dismissError()">×</button>
           </div>
         }
+
+        @if (showSuccess()) {
+          <div class="alert alert-success">
+            <span class="success-icon">✓</span>
+            <span class="success-text">{{ successMessage() }}</span>
+            <button class="close-success" (click)="dismissSuccess()">×</button>
+          </div>
+        }
       </form>
     </div>
   `,
@@ -254,6 +266,8 @@ export class AddSiteComponent implements OnInit {
   editingSite = signal<Site | null>(null);
   errorMessage = signal<string>('');
   showError = signal<boolean>(false);
+  successMessage = signal<string>('');
+  showSuccess = signal<boolean>(false);
 
   constructor(
     private fb: FormBuilder,
@@ -347,7 +361,7 @@ export class AddSiteComponent implements OnInit {
       isLeaf: [false],
       pricePerHour: [null],
       integrationCode: [''],
-      numberOfSlots: [null, [Validators.min(1), Validators.max(10000)]]
+      numberOfSlots: [null, [Validators.min(1), Validators.max(10000), CustomValidators.integer()]]
     });
   }
 
@@ -387,9 +401,10 @@ export class AddSiteComponent implements OnInit {
       ]);
       
       this.siteForm.get('numberOfSlots')?.setValidators([
-        Validators.required, 
-        Validators.min(1), 
-        Validators.max(10000)
+        Validators.required,
+        Validators.min(1),
+        Validators.max(10000),
+        CustomValidators.integer()
       ]);
     } else {
       // Remove validators for leaf fields
@@ -543,10 +558,15 @@ export class AddSiteComponent implements OnInit {
         this.siteService.updateSite(this.editingSite()!.id, updates).subscribe({
           next: (updatedSite) => {
             console.log('Site updated successfully');
-            // Select the updated site in the dashboard
-            this.siteService.selectSite(updatedSite);
-            this.clearSavedData();
-            this.router.navigate(['/admin']);
+            // Show success message
+            this.displaySuccess('MESSAGES.SITE_UPDATED');
+
+            // Select the updated site and navigate after showing message
+            setTimeout(() => {
+              this.siteService.selectSite(updatedSite);
+              this.clearSavedData();
+              this.router.navigate(['/admin']);
+            }, 2000);
           },
           error: (error) => {
             console.error('Error updating site:', error);
@@ -582,9 +602,14 @@ export class AddSiteComponent implements OnInit {
 
         this.siteService.createSite(request).subscribe({
           next: (newSite) => {
-            // Clear saved data after successful submission
-            this.clearSavedData();
-            this.router.navigate(['/admin']);
+            // Show success message
+            this.displaySuccess('MESSAGES.SITE_ADDED_SUCCESS');
+
+            // Clear saved data and navigate after showing message
+            setTimeout(() => {
+              this.clearSavedData();
+              this.router.navigate(['/admin']);
+            }, 2000);
           },
           error: (error) => {
             console.error('Error creating site:', error);
@@ -748,9 +773,10 @@ export class AddSiteComponent implements OnInit {
           ]);
           
           this.siteForm.get('numberOfSlots')?.setValidators([
-            Validators.required, 
-            Validators.min(1), 
-            Validators.max(10000)
+            Validators.required,
+            Validators.min(1),
+            Validators.max(10000),
+            CustomValidators.integer()
           ]);
         }
         
@@ -810,5 +836,26 @@ export class AddSiteComponent implements OnInit {
   dismissError(): void {
     this.showError.set(false);
     this.errorMessage.set('');
+  }
+
+  /**
+   * Display success message
+   */
+  private displaySuccess(messageKey: string): void {
+    this.successMessage.set(messageKey);
+    this.showSuccess.set(true);
+
+    // Auto-hide success message after 2 seconds
+    setTimeout(() => {
+      this.dismissSuccess();
+    }, 2000);
+  }
+
+  /**
+   * Dismiss success message
+   */
+  dismissSuccess(): void {
+    this.showSuccess.set(false);
+    this.successMessage.set('');
   }
 }

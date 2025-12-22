@@ -293,7 +293,7 @@ export class PolygonFormComponent implements OnInit {
   onSubmit(): void {
     // Mark all fields as touched to show validation errors
     this.markFormGroupTouched(this.polygonForm);
-    
+
     if (this.polygonForm.valid && this.coordinatesFormArray.length >= 3) {
       const formValue = this.polygonForm.value;
       const request: CreatePolygonRequest = {
@@ -303,15 +303,25 @@ export class PolygonFormComponent implements OnInit {
       };
 
       const returnTo = this.route.snapshot.queryParams['returnTo'];
-      
+
       if (returnTo === 'add-site') {
+        // Check for duplicate polygon name in temporary storage
+        if (this.isDuplicatePolygonName(request.name)) {
+          this.displayBackendError({
+            error: {
+              error: 'Polygon name already exists. Please use a different name.'
+            }
+          });
+          return;
+        }
+
         // For new sites: store polygon data temporarily (support multiple polygons)
         this.addPolygonToTempStorage({
           name: request.name,
           coordinates: request.coordinates
         });
         localStorage.setItem('polygonAdded', 'true');
-        
+
         this.showSuccessMessage();
       } else {
         // For existing sites: create or update the polygon
@@ -541,6 +551,18 @@ export class PolygonFormComponent implements OnInit {
       console.error('Error getting temp polygons:', error);
       return [];
     }
+  }
+
+  /**
+   * Check if a polygon with the given name already exists in temporary storage
+   */
+  private isDuplicatePolygonName(name: string): boolean {
+    const existingPolygons = this.getTempPolygons();
+    const trimmedName = name.trim().toLowerCase();
+
+    return existingPolygons.some(polygon =>
+      polygon.name.trim().toLowerCase() === trimmedName
+    );
   }
 
   goBack(): void {
