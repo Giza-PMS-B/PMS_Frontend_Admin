@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, OnDestroy, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AsyncValidatorFn } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -116,7 +116,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                     (blur)="onPriceBlur($event)"
                     class="form-control price-input"
                     [class.error]="isFieldInvalid('pricePerHour')"
-                    placeholder="0.00">
+                    placeholder="0">
                   <span class="currency-suffix">SAR</span>
                 </div>
                 @if (isFieldInvalid('pricePerHour')) {
@@ -246,7 +246,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         @if (showSuccess()) {
           <div class="alert alert-success">
             <span class="success-icon">✓</span>
-            <span class="success-text">{{ successMessage() }}</span>
+            <span class="success-text">{{ successMessage() | translate }}</span>
             <button class="close-success" (click)="dismissSuccess()">×</button>
           </div>
         }
@@ -255,7 +255,7 @@ import { CustomValidators } from '../../validators/custom-validators';
   `,
   styleUrl: './add-site.component.scss'
 })
-export class AddSiteComponent implements OnInit {
+export class AddSiteComponent implements OnInit, OnDestroy {
   siteForm: FormGroup;
   parentSite = signal<Site | null>(null);
   isLeaf = signal<boolean>(false);
@@ -287,6 +287,12 @@ export class AddSiteComponent implements OnInit {
     const polygonAdded = this.route.snapshot.queryParams['polygonAdded'];
 
     console.log('ngOnInit - parentId:', parentId, 'siteId:', siteId, 'mode:', mode, 'polygonAdded:', polygonAdded);
+
+    // Clear saved data if starting fresh (no specific context parameters)
+    if (!parentId && !siteId && !mode && !polygonAdded) {
+      console.log('Starting fresh - clearing any existing form data');
+      this.clearSavedData();
+    }
 
     // Check if this is edit mode
     if (mode === 'edit' && siteId) {
@@ -344,6 +350,15 @@ export class AddSiteComponent implements OnInit {
     this.siteForm.get('nameEn')?.valueChanges.subscribe(() => {
       this.updateGeneratedPath();
     });
+  }
+
+  ngOnDestroy(): void {
+    // Clear form data when component is destroyed (navigating away)
+    // Only clear if we're not in edit mode and haven't successfully saved
+    if (!this.isEditMode() && !this.showSuccess()) {
+      console.log('Component destroyed - clearing unsaved form data');
+      this.clearSavedData();
+    }
   }
 
   private createForm(): FormGroup {
@@ -503,9 +518,20 @@ export class AddSiteComponent implements OnInit {
     let value = input.value;
     
     if (value && !isNaN(parseFloat(value))) {
-      // Format to exactly 2 decimal places
+      // Keep the original format if it's valid (don't force 2 decimal places)
       const numValue = parseFloat(value);
-      const formattedValue = numValue.toFixed(2);
+      
+      // Only format if the value has more than 2 decimal places
+      const decimalPlaces = (value.toString().split('.')[1] || '').length;
+      let formattedValue = value;
+      
+      if (decimalPlaces > 2) {
+        // Round to 2 decimal places if more than 2 decimals
+        formattedValue = numValue.toFixed(2);
+      } else {
+        // Keep original format (integer, 1 decimal, or 2 decimals)
+        formattedValue = numValue.toString();
+      }
       
       // Update both input and form control
       input.value = formattedValue;
