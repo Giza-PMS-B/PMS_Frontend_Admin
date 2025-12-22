@@ -193,18 +193,41 @@ export class CustomValidators {
 
       for (let i = 0; i < coordinates.length; i++) {
         const coord = coordinates[i];
-        if (coord && coord.latitude !== null && coord.longitude !== null && 
+        if (coord && coord.latitude !== null && coord.longitude !== null &&
             coord.latitude !== undefined && coord.longitude !== undefined) {
-          
+
           // Create a string representation of the coordinate pair
           const coordString = `${coord.latitude},${coord.longitude}`;
-          
+
           if (coordinateStrings.has(coordString)) {
             return { duplicateCoordinates: { message: 'Duplicate points are not allowed in the polygon' } };
           }
-          
+
           coordinateStrings.add(coordString);
         }
+      }
+
+      return null;
+    };
+  }
+
+  // Integer validator (no decimals allowed)
+  static integer(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value && control.value !== 0) {
+        return null;
+      }
+
+      const value = control.value;
+
+      // Check if value is a number
+      if (isNaN(value)) {
+        return { integer: { value: control.value } };
+      }
+
+      // Check if value is an integer (no decimal part)
+      if (!Number.isInteger(Number(value))) {
+        return { integer: { value: control.value } };
       }
 
       return null;

@@ -64,6 +64,7 @@
     "PRICE_MIN": "Price must be greater than 0",
     "PRICE_MAX": "Price cannot exceed 999.99",
     "SLOTS_RANGE": "The number of slots should be in the range of 1 to 10000 slot",
+    "INTEGER_ONLY": "Please enter integer only",
     "INTEGRATION_CODE_FORMAT": "Please enter a valid format",
     "INTEGRATION_CODE_EXISTS": "Integration Code Already Exists",
     "UNIQUE_NAME": "This name is already in use",
@@ -76,6 +77,7 @@
   "MESSAGES": {
     "SITE_CREATED": "Site created successfully!",
     "SITE_UPDATED": "Site updated successfully!",
+    "SITE_ADDED_SUCCESS": "The site was added successfully",
     "POLYGON_CREATED": "Polygon saved successfully!",
     "POLYGON_UPDATED": "Polygon updated successfully!",
     "POLYGON_REQUIRED": "Polygon must be added before saving a leaf site",
