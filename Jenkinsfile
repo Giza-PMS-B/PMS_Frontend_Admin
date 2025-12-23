@@ -22,7 +22,7 @@ pipeline {
             steps {
                 git(
                     url: 'https://github.com/Giza-PMS-B/PMS_Frontend_Admin.git',
-                    branch: 'main',
+                    branch: 'feature/docker-swarm',
                     credentialsId: 'github-pat-wagih'
                 )
             }
