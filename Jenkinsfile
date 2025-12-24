@@ -6,12 +6,12 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME     = "pms-admin-frontend"
+        DOCKER_REPO    = "wagihh/pms-admin-frontend"
         CONTAINER_NAME = "admin-frontend"
         APP_PORT       = "8085"
 
-        BUILD_IMAGE    = "${IMAGE_NAME}:${BUILD_NUMBER}"
-        LATEST_IMAGE   = "${IMAGE_NAME}:latest"
+        BUILD_IMAGE    = "${DOCKER_REPO}:${BUILD_NUMBER}"
+        LATEST_IMAGE   = "${DOCKER_REPO}:latest"
         PREVIOUS_IMAGE = ""
     }
 
@@ -38,11 +38,36 @@ pipeline {
             }
         }
 
+        stage('Docker Login') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'Docker-PAT',
+                        usernameVariable: 'DOCKER_USER',
+                        passwordVariable: 'DOCKER_PASS'
+                    )
+                ]) {
+                    sh '''
+                      echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    '''
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
                 sh """
                   docker build -t ${BUILD_IMAGE} .
                   docker tag ${BUILD_IMAGE} ${LATEST_IMAGE}
+                """
+            }
+        }
+
+        stage('Push Docker Images') {
+            steps {
+                sh """
+                  docker push ${BUILD_IMAGE}
+                  docker push ${LATEST_IMAGE}
                 """
             }
         }
@@ -90,7 +115,7 @@ pipeline {
         }
 
         success {
-            echo "✅ Admin Frontend deployed successfully"
+            echo "✅ Admin Frontend built, pushed, and deployed successfully"
         }
     }
 }
