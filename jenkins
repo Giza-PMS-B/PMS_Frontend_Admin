@@ -7,7 +7,8 @@ pipeline {
 
     environment {
         IMAGE_NAME     = "pms-admin-frontend"
-        CONTAINER_NAME = "admin-frontend"
+        STACK_NAME     = "pms"
+        SERVICE_NAME   = "admin-frontend"
         APP_PORT       = "8085"
 
         BUILD_IMAGE    = "${IMAGE_NAME}:${BUILD_NUMBER}"
@@ -27,11 +28,23 @@ pipeline {
             }
         }
 
+        stage('Verify Docker Swarm') {
+            steps {
+                sh '''
+                  STATE=$(docker info --format '{{.Swarm.LocalNodeState}}')
+                  if [ "$STATE" != "active" ]; then
+                    echo "Docker Swarm is not active"
+                    exit 1
+                  fi
+                '''
+            }
+        }
+
         stage('Save Previous Image') {
             steps {
                 script {
                     PREVIOUS_IMAGE = sh(
-                        script: "docker inspect ${CONTAINER_NAME} --format '{{.Config.Image}}' || true",
+                        script: "docker service inspect ${STACK_NAME}_${SERVICE_NAME} --format '{{.Spec.TaskTemplate.ContainerSpec.Image}}' || true",
                         returnStdout: true
                     ).trim()
                 }
@@ -47,24 +60,27 @@ pipeline {
             }
         }
 
-        stage('Deploy Frontend (Docker Run)') {
+        stage('Deploy to Docker Swarm') {
             steps {
                 sh """
-                  docker rm -f ${CONTAINER_NAME} || true
-
-                  docker run -d \
-                    --name ${CONTAINER_NAME} \
-                    -p ${APP_PORT}:80 \
-                    ${BUILD_IMAGE}
+                  IMAGE_TAG=${BUILD_IMAGE} docker stack deploy -c docker-compose.yml ${STACK_NAME}
                 """
             }
         }
 
-        stage('Health Check') {
+        stage('Health Check (Swarm Native)') {
             steps {
                 sh '''
-                  sleep 5
-                  curl -f http://localhost:8085 || exit 1
+                  sleep 10
+
+                  RUNNING=$(docker service ps ${STACK_NAME}_${SERVICE_NAME} \
+                    --filter "desired-state=running" \
+                    --format "{{.CurrentState}}" | grep Running | wc -l)
+
+                  if [ "$RUNNING" -lt 1 ]; then
+                    echo "Service is not running"
+                    exit 1
+                  fi
                 '''
             }
         }
@@ -77,11 +93,7 @@ pipeline {
             script {
                 if (PREVIOUS_IMAGE?.trim()) {
                     sh """
-                      docker rm -f ${CONTAINER_NAME} || true
-                      docker run -d \
-                        --name ${CONTAINER_NAME} \
-                        -p ${APP_PORT}:80 \
-                        ${PREVIOUS_IMAGE}
+                      IMAGE_TAG=${PREVIOUS_IMAGE} docker stack deploy -c docker-compose.yml ${STACK_NAME}
                     """
                 } else {
                     echo "No previous image found — rollback skipped"
