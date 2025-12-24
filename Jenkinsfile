@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_REPO    = "omareldamaty/pms-admin-frontend"
+        DOCKER_REPO    = "wagihh/pms-admin-frontend"
         CONTAINER_NAME = "admin-frontend"
         APP_PORT       = "8085"
 
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 withCredentials([
                     usernamePassword(
-                        credentialsId: 'Docker-PAT',
+                        credentialsId: 'Docker-Patt',
                         usernameVariable: 'DOCKER_USER',
                         passwordVariable: 'DOCKER_PASS'
                     )
