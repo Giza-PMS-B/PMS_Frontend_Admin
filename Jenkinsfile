@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME     = "omareldamaty/pms-admin-frontend"
+        IMAGE_NAME     = "wagihh/pms-admin-frontend"
         STACK_NAME     = "pms-admin"
         SERVICE_NAME   = "admin-frontend"
 
@@ -65,15 +65,6 @@ pipeline {
                 sh """
                   docker build -t ${BUILD_IMAGE} .
                   docker tag ${BUILD_IMAGE} ${LATEST_IMAGE}
-                """
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                sh """
-                  docker push ${BUILD_IMAGE}
-                  docker push ${LATEST_IMAGE}
                 """
             }
         }
