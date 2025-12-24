@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME     = "wagihh/pms-admin-frontend"
+        IMAGE_NAME     = "omareldamaty/pms-admin-frontend"
         STACK_NAME     = "pms-admin"
         SERVICE_NAME   = "admin-frontend"
 
