@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    triggers {
-        pollSCM('H/2 * * * *')
-    }
-
     environment {
         IMAGE_NAME     = "omareldamaty/pms-admin-frontend"
         STACK_NAME     = "pms-admin"
