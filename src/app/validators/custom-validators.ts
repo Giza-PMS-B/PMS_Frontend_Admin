@@ -59,12 +59,7 @@ export class CustomValidators {
         return { arabicTextSpecialOnly: { value: control.value } };
       }
 
-      // Check if contains at least one Arabic letter
-      const hasArabicLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(value);
-      if (!hasArabicLetter) {
-        return { arabicText: { value: control.value } };
-      }
-
+      // Allow numeric-only input or input with Arabic letters
       // Arabic characters, numbers, and only specific special characters: - _ space .
       const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9\s\-_.]+$/;
       return pattern.test(value) ? null : { arabicText: { value: control.value } };
@@ -91,12 +86,7 @@ export class CustomValidators {
         return { englishTextSpecialOnly: { value: control.value } };
       }
 
-      // Check if contains at least one English letter
-      const hasEnglishLetter = /[a-zA-Z]/.test(value);
-      if (!hasEnglishLetter) {
-        return { englishText: { value: control.value } };
-      }
-
+      // Allow numeric-only input or input with English letters
       // English letters, numbers, and only specific special characters: - _ space .
       const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
       return pattern.test(value) ? null : { englishText: { value: control.value } };
@@ -206,12 +196,18 @@ export class CustomValidators {
 
       const value = control.value.trim();
 
-      // Check if empty after trimming or doesn't contain at least one letter (Arabic or English)
-      const hasLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z]/.test(value);
-      if (!value || !hasLetter) {
+      // Check if empty after trimming
+      if (!value) {
         return { mixedText: { value: control.value } };
       }
 
+      // Check if contains only special characters (no letters or numbers)
+      const hasLetterOrNumber = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9]/.test(value);
+      if (!hasLetterOrNumber) {
+        return { mixedTextSpecialOnly: { value: control.value } };
+      }
+
+      // Allow numeric-only input or input with Arabic/English letters
       // Arabic and English characters, numbers, and only specific special characters: - _ space .
       const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9\s\-_.]+$/;
       return pattern.test(value) ? null : { mixedText: { value: control.value } };
