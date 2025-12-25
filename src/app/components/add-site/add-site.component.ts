@@ -224,20 +224,9 @@ import { CustomValidators } from '../../validators/custom-validators';
               } @else {
                 <span class="status-value not-added">■ Not Added</span>
               }
-              <button 
-                type="button" 
-                class="add-polygon-btn" 
-                (click)="addPolygon()"
-                [disabled]="!areLeafFieldsValid()">
+              <button type="button" class="add-polygon-btn" (click)="addPolygon()">
                 + {{ 'POLYGON.ADD_POLYGON' | translate }}
               </button>
-              @if (isLeaf() && !areLeafFieldsValid()) {
-                <div class="polygon-requirement-message">
-                  <small class="text-info">
-                    {{ 'MESSAGES.FILL_REQUIRED_FIELDS_FIRST' | translate }}
-                  </small>
-                </div>
-              }
             </div>
           </div>
         }
@@ -514,25 +503,6 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     }
     
     return formValid;
-  }
-
-  /**
-   * Check if required leaf fields are valid (excluding polygon requirement)
-   * This is used to enable/disable the Add Polygon button
-   */
-  areLeafFieldsValid(): boolean {
-    if (!this.isLeaf()) {
-      return true; // Not applicable for parent sites
-    }
-
-    // Check if basic form fields are valid
-    const nameEnValid = this.siteForm.get('nameEn')?.valid;
-    const nameArValid = this.siteForm.get('nameAr')?.valid;
-    const priceValid = this.siteForm.get('pricePerHour')?.valid;
-    const integrationCodeValid = this.siteForm.get('integrationCode')?.valid;
-    const slotsValid = this.siteForm.get('numberOfSlots')?.valid;
-
-    return !!(nameEnValid && nameArValid && priceValid && integrationCodeValid && slotsValid);
   }
 
   onPriceInput(event: any): void {
