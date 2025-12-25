@@ -88,7 +88,6 @@
     "POLYGON_UPDATED": "Polygon updated successfully!",
     "POLYGON_REQUIRED": "Polygon must be added before saving a leaf site",
     "FILL_REQUIRED_FIELDS": "Fill all required fields",
-    "FILL_REQUIRED_FIELDS_FIRST": "Please fill all required fields before adding a polygon",
     "SELECT_SITE": "Select a site from the tree to view details",
     "PARENT_SITE_INFO": "This will be created as a Parent Site. To create a Leaf Site, use the \"+\" button next to a parent site in the tree."
   },

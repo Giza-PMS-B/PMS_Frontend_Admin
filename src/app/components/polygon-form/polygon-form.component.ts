@@ -166,7 +166,8 @@ import { CustomValidators } from '../../validators/custom-validators';
           </button>
           <button 
             type="submit" 
-            class="btn btn-primary">
+            class="btn btn-primary"
+            [disabled]="!isFormReady()">
             {{ isEdit() ? ('POLYGON.UPDATE_POLYGON' | translate) : ('POLYGON.SAVE_POLYGON' | translate) }}
           </button>
         </div>
@@ -306,10 +307,29 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
+  isFormReady(): boolean {
+    // Check if form is valid
+    const formValid = this.polygonForm.valid;
+    
+    // Check if we have at least 3 coordinates
+    const hasMinCoordinates = this.coordinatesFormArray.length >= 3;
+    
+    // Check if all coordinate fields are filled and valid
+    const coordinatesValid = this.coordinatesFormArray.controls.every(control => {
+      const lat = control.get('latitude');
+      const lng = control.get('longitude');
+      return lat?.valid && lng?.valid && lat?.value !== null && lng?.value !== null;
+    });
+    
+    return formValid && hasMinCoordinates && coordinatesValid;
+  }
+
   onSubmit(): void {
     // Mark all fields as touched to show validation errors
     this.markFormGroupTouched(this.polygonForm);
 
+    // The form should be valid at this point since the button is disabled when invalid
+    // But we'll keep this check as a safety measure
     if (this.polygonForm.valid && this.coordinatesFormArray.length >= 3) {
       const formValue = this.polygonForm.value;
       const request: CreatePolygonRequest = {
@@ -362,20 +382,8 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
           }
         });
       }
-    } else {
-      // Show generic validation error
-      this.showValidationError('MESSAGES.FILL_REQUIRED_FIELDS');
     }
-  }
-
-  private showValidationError(message: string): void {
-    this.errorMessage.set('MESSAGES.FILL_REQUIRED_FIELDS');
-    this.showErrorMessage.set(true);
-
-    // Hide error message after 3 seconds
-    setTimeout(() => {
-      this.showErrorMessage.set(false);
-    }, 3000);
+    // Removed the else block that showed validation error since button is now disabled
   }
 
   /**
