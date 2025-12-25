@@ -129,6 +129,11 @@
     width: 18px;
     height: 18px;
   }
+
+  // RTL layout - checkbox on the left, text on the right
+  &.rtl {
+    flex-direction: row-reverse;
+  }
 }
 
 .leaf-fields {
