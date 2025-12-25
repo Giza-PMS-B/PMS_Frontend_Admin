@@ -86,12 +86,12 @@ import { CustomValidators } from '../../validators/custom-validators';
 
         @if (hasParentSite()) {
           <div class="form-group">
-            <label class="toggle-label">
+            <label class="toggle-label" [class.rtl]="languageService.getIsRTL()">
+              <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
               <input
                 type="checkbox"
                 formControlName="isLeaf"
                 (change)="onLeafToggleChange()">
-              <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
             </label>
           </div>
         } @else {
@@ -276,7 +276,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     private siteService: SiteService,
     private router: Router,
     private route: ActivatedRoute,
-    private languageService: LanguageService
+    public languageService: LanguageService
   ) {
     this.siteForm = this.createForm();
   }
