@@ -95,6 +95,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['required']) {
                         <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
                       }
+                      @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['latitudeInvalidFormat']) {
+                        <div>• {{ 'VALIDATION.LATITUDE_INVALID_FORMAT' | translate }}</div>
+                      }
                       @if (coordinatesFormArray.at($index).get('latitude')?.errors?.['invalidLatitude']) {
                         <div>• {{ 'VALIDATION.INVALID_NUMBER' | translate }}</div>
                       }
@@ -121,6 +124,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                     <div class="coordinate-error">
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['required']) {
                         <div>• {{ 'VALIDATION.REQUIRED' | translate }}</div>
+                      }
+                      @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['longitudeInvalidFormat']) {
+                        <div>• {{ 'VALIDATION.LONGITUDE_INVALID_FORMAT' | translate }}</div>
                       }
                       @if (coordinatesFormArray.at($index).get('longitude')?.errors?.['invalidLongitude']) {
                         <div>• {{ 'VALIDATION.INVALID_NUMBER' | translate }}</div>
