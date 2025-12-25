@@ -142,7 +142,20 @@ export class CustomValidators {
         return null;
       }
       
-      const value = parseFloat(control.value);
+      const inputValue = control.value.toString().trim();
+      
+      // Check if input contains only numbers, decimal point, and optional minus sign
+      const validFormatPattern = /^-?\d*\.?\d*$/;
+      if (!validFormatPattern.test(inputValue)) {
+        return { latitudeInvalidFormat: { value: control.value } };
+      }
+      
+      // Check if it's empty after removing valid characters
+      if (inputValue === '' || inputValue === '-' || inputValue === '.') {
+        return null; // Let required validator handle empty values
+      }
+      
+      const value = parseFloat(inputValue);
       if (isNaN(value)) {
         return { invalidLatitude: { value: control.value } };
       }
@@ -152,7 +165,7 @@ export class CustomValidators {
       }
       
       // Check decimal places (up to 6)
-      const decimalPlaces = (control.value.toString().split('.')[1] || '').length;
+      const decimalPlaces = (inputValue.split('.')[1] || '').length;
       if (decimalPlaces > 6) {
         return { latitudeDecimalPlaces: { value: control.value } };
       }
@@ -168,7 +181,20 @@ export class CustomValidators {
         return null;
       }
       
-      const value = parseFloat(control.value);
+      const inputValue = control.value.toString().trim();
+      
+      // Check if input contains only numbers, decimal point, and optional minus sign
+      const validFormatPattern = /^-?\d*\.?\d*$/;
+      if (!validFormatPattern.test(inputValue)) {
+        return { longitudeInvalidFormat: { value: control.value } };
+      }
+      
+      // Check if it's empty after removing valid characters
+      if (inputValue === '' || inputValue === '-' || inputValue === '.') {
+        return null; // Let required validator handle empty values
+      }
+      
+      const value = parseFloat(inputValue);
       if (isNaN(value)) {
         return { invalidLongitude: { value: control.value } };
       }
@@ -178,7 +204,7 @@ export class CustomValidators {
       }
       
       // Check decimal places (up to 6)
-      const decimalPlaces = (control.value.toString().split('.')[1] || '').length;
+      const decimalPlaces = (inputValue.split('.')[1] || '').length;
       if (decimalPlaces > 6) {
         return { longitudeDecimalPlaces: { value: control.value } };
       }

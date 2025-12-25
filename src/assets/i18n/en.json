@@ -77,7 +77,9 @@
     "UNIQUE_NAME": "This name is already in use",
     "UNIQUE_POLYGON": "This polygon name is already in use",
     "LATITUDE_RANGE": "Range: -90 to +90",
+    "LATITUDE_INVALID_FORMAT": "Only numbers are allowed",
     "LONGITUDE_RANGE": "Range: -180 to +180",
+    "LONGITUDE_INVALID_FORMAT": "Only numbers are allowed",
     "DECIMAL_PLACES": "Max 6 decimal places",
     "INVALID_NUMBER": "Invalid number"
   },
