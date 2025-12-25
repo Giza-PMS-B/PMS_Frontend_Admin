@@ -39,6 +39,9 @@ import { CustomValidators } from '../../validators/custom-validators';
               @if (polygonForm.get('polygonName')?.errors?.['mixedText']) {
                 <div>• {{ 'VALIDATION.MIXED_TEXT' | translate }}</div>
               }
+              @if (polygonForm.get('polygonName')?.errors?.['mixedTextSpecialOnly']) {
+                <div>• {{ 'VALIDATION.MIXED_TEXT_SPECIAL_ONLY' | translate }}</div>
+              }
               @if (polygonForm.get('polygonName')?.errors?.['uniquePolygonName']) {
                 <div>• {{ 'VALIDATION.UNIQUE_POLYGON' | translate }}</div>
               }
