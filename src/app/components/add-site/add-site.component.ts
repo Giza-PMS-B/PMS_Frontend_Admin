@@ -50,6 +50,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
                   <div>• {{ 'VALIDATION.ENGLISH_TEXT' | translate }}</div>
                 }
+                @if (siteForm.get('nameEn')?.errors?.['englishTextSpecialOnly']) {
+                  <div>• {{ 'VALIDATION.ENGLISH_TEXT_SPECIAL_ONLY' | translate }}</div>
+                }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
                   <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
                 }
@@ -76,6 +79,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
                   <div>• {{ 'VALIDATION.ARABIC_TEXT' | translate }}</div>
                 }
+                @if (siteForm.get('nameAr')?.errors?.['arabicTextSpecialOnly']) {
+                  <div>• {{ 'VALIDATION.ARABIC_TEXT_SPECIAL_ONLY' | translate }}</div>
+                }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
                   <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
                 }
@@ -86,12 +92,22 @@ import { CustomValidators } from '../../validators/custom-validators';
 
         @if (hasParentSite()) {
           <div class="form-group">
-            <label class="toggle-label" [class.rtl]="languageService.getIsRTL()">
-              <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
-              <input
-                type="checkbox"
-                formControlName="isLeaf"
-                (change)="onLeafToggleChange()">
+            <label class="toggle-label">
+              @if (languageService.getIsRTL()) {
+                <!-- Arabic: checkbox first, then text (☐ موقع فرعي) -->
+                <input
+                  type="checkbox"
+                  formControlName="isLeaf"
+                  (change)="onLeafToggleChange()">
+                <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
+              } @else {
+                <!-- English: text first, then checkbox (Leaf ☐) -->
+                <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
+                <input
+                  type="checkbox"
+                  formControlName="isLeaf"
+                  (change)="onLeafToggleChange()">
+              }
             </label>
           </div>
         } @else {
@@ -208,9 +224,20 @@ import { CustomValidators } from '../../validators/custom-validators';
               } @else {
                 <span class="status-value not-added">■ Not Added</span>
               }
-              <button type="button" class="add-polygon-btn" (click)="addPolygon()">
+              <button 
+                type="button" 
+                class="add-polygon-btn" 
+                (click)="addPolygon()"
+                [disabled]="!areLeafFieldsValid()">
                 + {{ 'POLYGON.ADD_POLYGON' | translate }}
               </button>
+              @if (isLeaf() && !areLeafFieldsValid()) {
+                <div class="polygon-requirement-message">
+                  <small class="text-info">
+                    {{ 'MESSAGES.FILL_REQUIRED_FIELDS_FIRST' | translate }}
+                  </small>
+                </div>
+              }
             </div>
           </div>
         }
@@ -487,6 +514,25 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     }
     
     return formValid;
+  }
+
+  /**
+   * Check if required leaf fields are valid (excluding polygon requirement)
+   * This is used to enable/disable the Add Polygon button
+   */
+  areLeafFieldsValid(): boolean {
+    if (!this.isLeaf()) {
+      return true; // Not applicable for parent sites
+    }
+
+    // Check if basic form fields are valid
+    const nameEnValid = this.siteForm.get('nameEn')?.valid;
+    const nameArValid = this.siteForm.get('nameAr')?.valid;
+    const priceValid = this.siteForm.get('pricePerHour')?.valid;
+    const integrationCodeValid = this.siteForm.get('integrationCode')?.valid;
+    const slotsValid = this.siteForm.get('numberOfSlots')?.valid;
+
+    return !!(nameEnValid && nameArValid && priceValid && integrationCodeValid && slotsValid);
   }
 
   onPriceInput(event: any): void {

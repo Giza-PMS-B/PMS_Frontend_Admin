@@ -48,9 +48,20 @@ export class CustomValidators {
 
       const value = control.value.trim();
 
-      // Check if empty after trimming or doesn't contain at least one Arabic letter
+      // Check if empty after trimming
+      if (!value) {
+        return { arabicText: { value: control.value } };
+      }
+
+      // Check if contains only special characters (no letters or numbers)
+      const hasLetterOrNumber = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9]/.test(value);
+      if (!hasLetterOrNumber) {
+        return { arabicTextSpecialOnly: { value: control.value } };
+      }
+
+      // Check if contains at least one Arabic letter
       const hasArabicLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(value);
-      if (!value || !hasArabicLetter) {
+      if (!hasArabicLetter) {
         return { arabicText: { value: control.value } };
       }
 
@@ -69,9 +80,20 @@ export class CustomValidators {
 
       const value = control.value.trim();
 
-      // Check if empty after trimming or doesn't contain at least one English letter
+      // Check if empty after trimming
+      if (!value) {
+        return { englishText: { value: control.value } };
+      }
+
+      // Check if contains only special characters (no letters or numbers)
+      const hasLetterOrNumber = /[a-zA-Z0-9]/.test(value);
+      if (!hasLetterOrNumber) {
+        return { englishTextSpecialOnly: { value: control.value } };
+      }
+
+      // Check if contains at least one English letter
       const hasEnglishLetter = /[a-zA-Z]/.test(value);
-      if (!value || !hasEnglishLetter) {
+      if (!hasEnglishLetter) {
         return { englishText: { value: control.value } };
       }
 

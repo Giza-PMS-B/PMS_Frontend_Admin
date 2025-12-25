@@ -59,7 +59,9 @@
     "SITE_NAME_LENGTH": "The site name must contain number of characters in the range 3 to 100 characters",
     "POLYGON_NAME_LENGTH": "The polygon name must contain number of characters in the range 3 to 100 characters",
     "ENGLISH_TEXT": "Please enter valid input using English letters, and the following special characters: [ - , _ , space, .]",
+    "ENGLISH_TEXT_SPECIAL_ONLY": "Invalid input: special characters must be combined with letters or numbers.",
     "ARABIC_TEXT": "Please enter valid input using Arabic letters, and the following special characters: [ - , _ , space, .]",
+    "ARABIC_TEXT_SPECIAL_ONLY": "Invalid input: special characters must be combined with letters or numbers.",
     "MIXED_TEXT": "Please enter valid input using Arabic/English letters, and the following special characters: [ - , _ , space, .]",
     "PRICE_FORMAT": "Price must have up to 2 decimal places (e.g., 5, 5.5, 5.50)",
     "PRICE_MIN": "Price must be greater than 0",
@@ -86,6 +88,7 @@
     "POLYGON_UPDATED": "Polygon updated successfully!",
     "POLYGON_REQUIRED": "Polygon must be added before saving a leaf site",
     "FILL_REQUIRED_FIELDS": "Fill all required fields",
+    "FILL_REQUIRED_FIELDS_FIRST": "Please fill all required fields before adding a polygon",
     "SELECT_SITE": "Select a site from the tree to view details",
     "PARENT_SITE_INFO": "This will be created as a Parent Site. To create a Leaf Site, use the \"+\" button next to a parent site in the tree."
   },
