@@ -59,12 +59,15 @@ import { CustomValidators } from '../../validators/custom-validators';
             <div class="mock-map readonly-map">
               <div class="map-grid"></div>
               @for (coordinate of coordinates(); track $index) {
-                <div 
-                  class="map-point" 
-                  [style.left.%]="getMapX(coordinate.longitude)"
-                  [style.top.%]="getMapY(coordinate.latitude)">
-                  {{ $index + 1 }}
-                </div>
+                @if (coordinate.latitude !== null && coordinate.longitude !== null && 
+                     !isNaN(coordinate.latitude) && !isNaN(coordinate.longitude)) {
+                  <div 
+                    class="map-point" 
+                    [style.left.%]="getMapX(coordinate.longitude)"
+                    [style.top.%]="getMapY(coordinate.latitude)">
+                    {{ $index + 1 }}
+                  </div>
+                }
               }
             </div>
           </div>
@@ -83,8 +86,9 @@ import { CustomValidators } from '../../validators/custom-validators';
               <div [formGroupName]="$index" class="coordinate-row">
                 <div class="coordinate-input-group">
                   <input 
-                    type="text" 
+                    type="number" 
                     formControlName="latitude" 
+                    step="0.000001"
                     class="form-control"
                     [class.error]="isCoordinateFieldInvalid($index, 'latitude')"
                     (input)="updateCoordinatesSignal()"
@@ -112,8 +116,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                 
                 <div class="coordinate-input-group">
                   <input 
-                    type="text" 
+                    type="number" 
                     formControlName="longitude" 
+                    step="0.000001"
                     class="form-control"
                     [class.error]="isCoordinateFieldInvalid($index, 'longitude')"
                     (input)="updateCoordinatesSignal()"
@@ -298,7 +303,12 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
 
 
   updateCoordinatesSignal(): void {
-    const coords: Coordinate[] = this.coordinatesFormArray.value;
+    const coords: Coordinate[] = this.coordinatesFormArray.value.map((coord: any) => ({
+      latitude: coord.latitude !== null && coord.latitude !== '' && coord.latitude !== undefined ? parseFloat(coord.latitude) : null,
+      longitude: coord.longitude !== null && coord.longitude !== '' && coord.longitude !== undefined ? parseFloat(coord.longitude) : null
+    }));
+    
+    console.log('Updated coordinates:', coords); // Debug log
     this.coordinates.set(coords);
     // Trigger validation to check for duplicate coordinates
     this.coordinatesFormArray.updateValueAndValidity();
