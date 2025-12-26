@@ -83,9 +83,8 @@ import { CustomValidators } from '../../validators/custom-validators';
               <div [formGroupName]="$index" class="coordinate-row">
                 <div class="coordinate-input-group">
                   <input 
-                    type="number" 
+                    type="text" 
                     formControlName="latitude" 
-                    step="0.000001"
                     class="form-control"
                     [class.error]="isCoordinateFieldInvalid($index, 'latitude')"
                     (input)="updateCoordinatesSignal()"
@@ -113,9 +112,8 @@ import { CustomValidators } from '../../validators/custom-validators';
                 
                 <div class="coordinate-input-group">
                   <input 
-                    type="number" 
+                    type="text" 
                     formControlName="longitude" 
-                    step="0.000001"
                     class="form-control"
                     [class.error]="isCoordinateFieldInvalid($index, 'longitude')"
                     (input)="updateCoordinatesSignal()"
