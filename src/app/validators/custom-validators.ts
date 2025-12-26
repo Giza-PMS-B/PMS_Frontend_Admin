@@ -144,9 +144,10 @@ export class CustomValidators {
       
       const inputValue = control.value.toString().trim();
       
-      // Check if input contains only numbers, decimal point, and optional minus sign
+      // Check if input contains only numbers, decimal point, and optional minus sign (no letters including 'e')
       const validFormatPattern = /^-?\d*\.?\d*$/;
-      if (!validFormatPattern.test(inputValue)) {
+      const hasLetters = /[a-zA-Z]/.test(inputValue);
+      if (!validFormatPattern.test(inputValue) || hasLetters) {
         return { latitudeInvalidFormat: { value: control.value } };
       }
       
@@ -183,9 +184,10 @@ export class CustomValidators {
       
       const inputValue = control.value.toString().trim();
       
-      // Check if input contains only numbers, decimal point, and optional minus sign
+      // Check if input contains only numbers, decimal point, and optional minus sign (no letters including 'e')
       const validFormatPattern = /^-?\d*\.?\d*$/;
-      if (!validFormatPattern.test(inputValue)) {
+      const hasLetters = /[a-zA-Z]/.test(inputValue);
+      if (!validFormatPattern.test(inputValue) || hasLetters) {
         return { longitudeInvalidFormat: { value: control.value } };
       }
       
