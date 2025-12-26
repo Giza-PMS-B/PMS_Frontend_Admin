@@ -60,7 +60,7 @@ import { CustomValidators } from '../../validators/custom-validators';
               <div class="map-grid"></div>
               @for (coordinate of coordinates(); track $index) {
                 @if (coordinate.latitude !== null && coordinate.longitude !== null && 
-                     !isNaN(coordinate.latitude) && !isNaN(coordinate.longitude)) {
+                     isValidNumber(coordinate.latitude) && isValidNumber(coordinate.longitude)) {
                   <div 
                     class="map-point" 
                     [style.left.%]="getMapX(coordinate.longitude)"
@@ -76,6 +76,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         <div class="coordinates-section">
           <h3>{{ 'POLYGON.COORDINATES_LIST' | translate }}</h3>
           <div class="coordinates-header">
+            <span>#</span>
             <span>{{ 'POLYGON.LATITUDE' | translate }}</span>
             <span>{{ 'POLYGON.LONGITUDE' | translate }}</span>
             <span>{{ 'POLYGON.ACTIONS' | translate }}</span>
@@ -84,6 +85,9 @@ import { CustomValidators } from '../../validators/custom-validators';
           <div formArrayName="coordinates" class="coordinates-list">
             @for (coordinate of coordinatesFormArray.controls; track $index) {
               <div [formGroupName]="$index" class="coordinate-row">
+                <div class="coordinate-number">
+                  {{ $index + 1 }}
+                </div>
                 <div class="coordinate-input-group">
                   <input 
                     type="number" 
@@ -148,7 +152,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   type="button" 
                   class="remove-btn" 
                   (click)="removeCoordinate($index)"
-                  [disabled]="coordinatesFormArray.length <= 1">
+                  [disabled]="coordinatesFormArray.length <= 3">
                   ×
                 </button>
               </div>
@@ -215,6 +219,7 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
   message = signal<string>('');
   showErrorMessage = signal<boolean>(false);
   errorMessage = signal<string>('');
+  private coordinateCounter = 1; // Counter for unique coordinate identifiers
 
   constructor(
     private fb: FormBuilder,
@@ -239,8 +244,10 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
       // Load existing polygon data for editing
       this.loadExistingPolygon(siteId);
     } else {
-      // Add initial coordinate at (0, 0) for new polygons
-      this.addCoordinate();
+      // Add 3 initial coordinates for new polygons (minimum required for a polygon)
+      this.addCoordinate(); // Coordinate 1
+      this.addCoordinate(); // Coordinate 2
+      this.addCoordinate(); // Coordinate 3
     }
   }
 
@@ -294,7 +301,7 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
   }
 
   removeCoordinate(index: number): void {
-    if (this.coordinatesFormArray.length > 1) {
+    if (this.coordinatesFormArray.length > 3) {
       this.coordinatesFormArray.removeAt(index);
       this.updateCoordinatesSignal();
     }
@@ -444,6 +451,10 @@ export class PolygonFormComponent implements OnInit, OnDestroy {
     // Convert latitude (-90 to 90) to percentage (0 to 100)
     // Note: Map Y is inverted (0 at top, 100 at bottom)
     return ((90 - latitude) / 180) * 100;
+  }
+
+  isValidNumber(value: any): boolean {
+    return value !== null && value !== undefined && !Number.isNaN(value);
   }
 
   private loadExistingPolygon(siteId: string): void {

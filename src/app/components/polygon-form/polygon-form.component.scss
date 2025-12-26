@@ -184,7 +184,7 @@
 
 .coordinates-header {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 40px 1fr 1fr auto;
   gap: 0.5rem;
   padding: 0.5rem;
   background: #f8f9fa;
@@ -204,13 +204,27 @@
 
 .coordinate-row {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: 40px 1fr 1fr auto;
   gap: 0.5rem;
   padding: 0.5rem;
   border-bottom: 1px solid #e9ecef;
 
   &:last-child {
     border-bottom: none;
+  }
+
+  .coordinate-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #007bff;
+    background: #e7f3ff;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 0.75rem;
+    margin: auto;
   }
 
   .coordinate-input-group {
@@ -361,7 +375,7 @@
 
   .coordinates-header,
   .coordinate-row {
-    grid-template-columns: 1fr 1fr 40px;
+    grid-template-columns: 30px 1fr 1fr 40px;
     font-size: 0.75rem;
   }
 
