@@ -712,9 +712,14 @@ export class AddSiteComponent implements OnInit, OnDestroy {
       try {
         const formData = JSON.parse(savedData);
 
-        // Restore form values
-        this.siteForm.patchValue(formData);
-        this.generatedPath.set(formData.generatedPath || '');
+        // Restore form values but NOT isLeaf (reset checkbox on reload)
+        this.siteForm.patchValue({
+          nameEn: formData.nameEn,
+          nameAr: formData.nameAr,
+          pricePerHour: formData.pricePerHour,
+          integrationCode: formData.integrationCode,
+          numberOfSlots: formData.numberOfSlots
+        });
 
         // Restore polygon count if available
         if (formData.polygonCount !== undefined) {
@@ -729,12 +734,15 @@ export class AddSiteComponent implements OnInit, OnDestroy {
             if (parent) {
               this.parentSite.set(parent);
 
-              // Restore leaf status and enable the control
+              // Reset leaf status to false on reload and enable the control
               this.siteForm.get('isLeaf')?.enable();
-              this.siteForm.get('isLeaf')?.setValue(formData.isLeaf || false);
-              this.isLeaf.set(formData.isLeaf || false);
+              this.siteForm.get('isLeaf')?.setValue(false);
+              this.isLeaf.set(false);
 
-              // Re-apply validators based on leaf status
+              // Update the path with the loaded parent site
+              this.updateGeneratedPath();
+
+              // Re-apply validators based on leaf status (false)
               setTimeout(() => {
                 this.onLeafToggleChange();
               }, 0);
@@ -746,6 +754,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           this.isLeaf.set(false);
           this.siteForm.get('isLeaf')?.setValue(false);
           this.siteForm.get('isLeaf')?.disable();
+          this.updateGeneratedPath();
         }
       } catch (error) {
         console.error('Error restoring form data:', error);
