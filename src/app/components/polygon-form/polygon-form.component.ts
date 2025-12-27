@@ -164,8 +164,9 @@ import { CustomValidators } from '../../validators/custom-validators';
           </button>
 
           @if (coordinatesFormArray.length < 3) {
-            <div class="validation-message">
-              {{ 'POLYGON.MIN_COORDINATES' | translate }}
+            <div class="coordinates-info">
+              <span class="info-icon">ⓘ</span>
+              <span class="info-text">{{ 'POLYGON.MIN_COORDINATES' | translate }}</span>
             </div>
           }
 

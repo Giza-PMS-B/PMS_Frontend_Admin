@@ -749,15 +749,30 @@ export class AddSiteComponent implements OnInit, OnDestroy {
               // Update parent path with loaded data (in case it changed)
               this.parentPath.set(parent.path);
 
-              // Reset leaf status to false on reload and enable the control
+              // CONDITIONAL RESTORATION: Only restore leaf status if polygon was added
+              // This implements the requirement: polygon is the commitment point
+              // - If polygon exists → preserve leaf checkbox and all data
+              // - If no polygon → reset to unchecked (treat reload as "start over")
               this.siteForm.get('isLeaf')?.enable();
-              this.siteForm.get('isLeaf')?.setValue(false);
-              this.isLeaf.set(false);
+
+              const polygonsData = this.getStoredPolygonData();
+              const hasPolygon = polygonsData.length > 0;
+
+              if (hasPolygon) {
+                // Polygon exists → restore leaf status from saved data
+                const savedIsLeaf = formData.isLeaf ?? false;
+                this.siteForm.get('isLeaf')?.setValue(savedIsLeaf);
+                this.isLeaf.set(savedIsLeaf);
+              } else {
+                // No polygon → reset to unchecked (reload without polygon = start over)
+                this.siteForm.get('isLeaf')?.setValue(false);
+                this.isLeaf.set(false);
+              }
 
               // Update the path again with the loaded parent site
               this.updateGeneratedPath();
 
-              // Re-apply validators based on leaf status (false)
+              // Re-apply validators based on leaf status
               setTimeout(() => {
                 this.onLeafToggleChange();
               }, 0);

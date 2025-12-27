@@ -49,7 +49,7 @@
     "MAP_NOTE": "Note: This is a placeholder. In a real implementation, integrate with a mapping service like Google Maps or Leaflet.",
     "COORDINATES_LIST": "Coordinates List",
     "ACTIONS": "Actions",
-    "MIN_COORDINATES": "Minimum of 3 coordinates required for a valid polygon",
+    "MIN_COORDINATES": "Minimum 3 coordinates required",
     "DUPLICATE_POINTS": "Duplicate points are not allowed in the polygon"
   },
   "VALIDATION": {
