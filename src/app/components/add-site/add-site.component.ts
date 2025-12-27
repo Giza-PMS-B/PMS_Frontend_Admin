@@ -94,12 +94,12 @@ import { CustomValidators } from '../../validators/custom-validators';
           <div class="form-group">
             <label class="toggle-label">
               @if (languageService.getIsRTL()) {
-                <!-- Arabic: checkbox first, then text (☐ موقع فرعي) -->
+                <!-- Arabic: text first, then checkbox (موقع فرعي ☐) -->
+                <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
                 <input
                   type="checkbox"
                   formControlName="isLeaf"
                   (change)="onLeafToggleChange()">
-                <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
               } @else {
                 <!-- English: text first, then checkbox (Leaf ☐) -->
                 <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
@@ -222,7 +222,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   }
                 </div>
               } @else {
-                <span class="status-value not-added">■ Not Added</span>
+                <span class="status-value not-added">{{ 'SITE.NONE_ADDED' | translate }}</span>
               }
               <button type="button" class="add-polygon-btn" (click)="addPolygon()">
                 + {{ 'POLYGON.ADD_POLYGON' | translate }}
