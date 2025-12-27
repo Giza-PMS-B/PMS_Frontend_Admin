@@ -74,7 +74,7 @@ import { CustomValidators } from '../../validators/custom-validators';
         </div>
 
         <div class="coordinates-section">
-          <h3>{{ 'POLYGON.COORDINATES_LIST' | translate }}</h3>
+          <h3>{{ 'POLYGON.COORDINATES_LIST' | translate }} <span class="min-coordinates-text">({{ 'POLYGON.MIN_COORDINATES' | translate }})</span></h3>
           <div class="coordinates-header">
             <span>#</span>
             <span>{{ 'POLYGON.LATITUDE' | translate }}</span>

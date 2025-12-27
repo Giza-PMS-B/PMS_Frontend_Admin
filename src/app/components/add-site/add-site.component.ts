@@ -51,7 +51,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   <div>• {{ 'VALIDATION.ENGLISH_TEXT' | translate }}</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['englishTextSpecialOnly']) {
-                  <div>• {{ 'VALIDATION.ENGLISH_TEXT_SPECIAL_ONLY' | translate }}</div>
+                  <div>• {{ 'VALIDATION.ENGLISH_TEXT' | translate }}</div>
                 }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
                   <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
@@ -80,7 +80,7 @@ import { CustomValidators } from '../../validators/custom-validators';
                   <div>• {{ 'VALIDATION.ARABIC_TEXT' | translate }}</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['arabicTextSpecialOnly']) {
-                  <div>• {{ 'VALIDATION.ARABIC_TEXT_SPECIAL_ONLY' | translate }}</div>
+                  <div>• {{ 'VALIDATION.ARABIC_TEXT' | translate }}</div>
                 }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
                   <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
