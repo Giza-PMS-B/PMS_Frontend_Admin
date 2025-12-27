@@ -275,6 +275,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   siteForm: FormGroup;
   parentSite = signal<Site | null>(null);
   parentSiteId: string | null = null; // Track parent ID from URL to avoid race condition
+  parentPath = signal<string>(''); // Track parent path for immediate use before async load
   isLeaf = signal<boolean>(false);
   generatedPath = signal<string>('');
   polygonAdded = signal<boolean>(false);
@@ -351,6 +352,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
       this.siteService.getSiteById(parentId).subscribe(parent => {
         if (parent) {
           this.parentSite.set(parent);
+          this.parentPath.set(parent.path); // Set parent path for correct path generation
           this.updateGeneratedPath();
           // Enable leaf toggle for new sites with parent
           this.siteForm.get('isLeaf')?.enable();
@@ -359,6 +361,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     } else if (!parentId && !localStorage.getItem('addSiteFormData') && !this.isEditMode()) {
       // If no parent site and no saved data, ensure isLeaf is false and disabled
       this.parentSiteId = null;
+      this.parentPath.set('');
       this.siteForm.get('isLeaf')?.setValue(false);
       this.siteForm.get('isLeaf')?.disable();
       this.isLeaf.set(false);
@@ -488,8 +491,9 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   private updateGeneratedPath(): void {
     const nameEn = this.siteForm.get('nameEn')?.value || '';
     const slug = this.slugify(nameEn);
-    const parentPath = this.parentSite()?.path || '';
-    this.generatedPath.set(parentPath ? `${parentPath}/${slug}` : `/${slug}`);
+    // Use the stored parentPath signal which is set immediately on restore
+    const parentPathValue = this.parentPath();
+    this.generatedPath.set(parentPathValue ? `${parentPathValue}/${slug}` : `/${slug}`);
   }
 
   private slugify(text: string): string {
@@ -692,6 +696,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     const formData = {
       ...this.siteForm.value,
       parentId: this.parentSiteId || this.parentSite()?.id, // Use parentSiteId to avoid race condition
+      parentPath: this.parentSite()?.path || '', // Save parent path for immediate restoration
       generatedPath: this.generatedPath(),
       polygonAdded: this.polygonAdded(),
       polygonCount: this.polygonCount(),
@@ -730,16 +735,26 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           // Store the parentSiteId immediately to ensure hasParentSite() returns true
           this.parentSiteId = formData.parentId;
 
+          // Restore parent path IMMEDIATELY for correct path generation
+          if (formData.parentPath) {
+            this.parentPath.set(formData.parentPath);
+          }
+
+          // Update path immediately with the restored parent path
+          this.updateGeneratedPath();
+
           this.siteService.getSiteById(formData.parentId).subscribe(parent => {
             if (parent) {
               this.parentSite.set(parent);
+              // Update parent path with loaded data (in case it changed)
+              this.parentPath.set(parent.path);
 
               // Reset leaf status to false on reload and enable the control
               this.siteForm.get('isLeaf')?.enable();
               this.siteForm.get('isLeaf')?.setValue(false);
               this.isLeaf.set(false);
 
-              // Update the path with the loaded parent site
+              // Update the path again with the loaded parent site
               this.updateGeneratedPath();
 
               // Re-apply validators based on leaf status (false)
@@ -751,6 +766,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
         } else {
           // No parent site, force to parent site
           this.parentSiteId = null;
+          this.parentPath.set('');
           this.isLeaf.set(false);
           this.siteForm.get('isLeaf')?.setValue(false);
           this.siteForm.get('isLeaf')?.disable();
@@ -826,10 +842,11 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           this.siteService.getSiteById(site.parentId).subscribe(parent => {
             if (parent) {
               this.parentSite.set(parent);
-              
+              this.parentPath.set(parent.path); // Set parent path for correct path generation
+
               // Enable the isLeaf control since we have a parent
               this.siteForm.get('isLeaf')?.enable();
-              
+
               // Properly configure the form based on leaf status
               setTimeout(() => {
                 this.onLeafToggleChange();
@@ -838,8 +855,9 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           });
         } else {
           // No parent site, disable leaf toggle
+          this.parentPath.set('');
           this.siteForm.get('isLeaf')?.disable();
-          
+
           // Still configure the form properly for the current state
           setTimeout(() => {
             this.onLeafToggleChange();
