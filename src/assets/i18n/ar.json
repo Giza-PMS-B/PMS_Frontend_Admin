@@ -72,6 +72,7 @@
     "INTEGRATION_CODE_FORMAT": "يرجى إدخال تنسيق صحيح",
     "INTEGRATION_CODE_EXISTS": "كود الربط موجود بالفعل",
     "SITE_NAME_EXISTS": "اسم الموقع موجود بالفعل",
+    "SITE_NAME_EXISTS_AT_LEVEL": "يوجد موقع بنفس الاسم في هذا المستوى",
     "INTEGRATION_CODE_ALREADY_EXISTS": "كود الربط موجود بالفعل",
     "VALUES_ALREADY_EXISTS": "هذه البيانات موجودة بالفعل",
     "UNIQUE_NAME": "هذا الاسم مستخدم بالفعل",
