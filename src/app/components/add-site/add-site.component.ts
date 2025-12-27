@@ -274,6 +274,7 @@ import { CustomValidators } from '../../validators/custom-validators';
 export class AddSiteComponent implements OnInit, OnDestroy {
   siteForm: FormGroup;
   parentSite = signal<Site | null>(null);
+  parentSiteId: string | null = null; // Track parent ID from URL to avoid race condition
   isLeaf = signal<boolean>(false);
   generatedPath = signal<string>('');
   polygonAdded = signal<boolean>(false);
@@ -303,6 +304,11 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     const mode = this.route.snapshot.queryParams['mode'];
     const polygonAdded = this.route.snapshot.queryParams['polygonAdded'];
     const returnFrom = this.route.snapshot.queryParams['returnFrom'];
+
+    // Store parentId from URL to avoid race condition with async parent loading
+    if (parentId) {
+      this.parentSiteId = parentId;
+    }
 
     console.log('ngOnInit - parentId:', parentId, 'siteId:', siteId, 'mode:', mode, 'polygonAdded:', polygonAdded, 'returnFrom:', returnFrom);
 
@@ -341,6 +347,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     // Handle parent site loading first (for new sites)
     if (parentId && !localStorage.getItem('addSiteFormData') && !this.isEditMode()) {
       console.log('Loading parent site for new site creation');
+      // parentSiteId is already set above, now load the full parent object
       this.siteService.getSiteById(parentId).subscribe(parent => {
         if (parent) {
           this.parentSite.set(parent);
@@ -351,6 +358,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
       });
     } else if (!parentId && !localStorage.getItem('addSiteFormData') && !this.isEditMode()) {
       // If no parent site and no saved data, ensure isLeaf is false and disabled
+      this.parentSiteId = null;
       this.siteForm.get('isLeaf')?.setValue(false);
       this.siteForm.get('isLeaf')?.disable();
       this.isLeaf.set(false);
@@ -408,7 +416,9 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   }
 
   hasParentSite(): boolean {
-    return this.parentSite() !== null;
+    // Check both the loaded parent site and the parentSiteId from URL
+    // This ensures the checkbox appears even if parent is still loading
+    return this.parentSite() !== null || this.parentSiteId !== null;
   }
 
   onLeafToggleChange(): void {
@@ -636,7 +646,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
         const request: CreateSiteRequest = {
           nameEn: formValue.nameEn,
           nameAr: formValue.nameAr,
-          parentId: this.parentSite()?.id,
+          parentId: this.parentSiteId || this.parentSite()?.id, // Use parentSiteId as primary source
           isLeaf: formValue.isLeaf,
           pricePerHour: formValue.pricePerHour,
           integrationCode: formValue.integrationCode,
@@ -681,7 +691,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   private saveFormData(): void {
     const formData = {
       ...this.siteForm.value,
-      parentId: this.parentSite()?.id,
+      parentId: this.parentSiteId || this.parentSite()?.id, // Use parentSiteId to avoid race condition
       generatedPath: this.generatedPath(),
       polygonAdded: this.polygonAdded(),
       polygonCount: this.polygonCount(),
@@ -694,33 +704,36 @@ export class AddSiteComponent implements OnInit, OnDestroy {
   private restoreFormData(): void {
     const savedData = localStorage.getItem('addSiteFormData');
     const polygonStatus = localStorage.getItem('polygonAdded');
-    
+
     console.log('Restoring form data:', savedData);
     console.log('Polygon status:', polygonStatus);
-    
+
     if (savedData) {
       try {
         const formData = JSON.parse(savedData);
-        
+
         // Restore form values
         this.siteForm.patchValue(formData);
         this.generatedPath.set(formData.generatedPath || '');
-        
+
         // Restore polygon count if available
         if (formData.polygonCount !== undefined) {
           this.polygonCount.set(formData.polygonCount);
         }
-        
+
         if (formData.parentId) {
+          // Store the parentSiteId immediately to ensure hasParentSite() returns true
+          this.parentSiteId = formData.parentId;
+
           this.siteService.getSiteById(formData.parentId).subscribe(parent => {
             if (parent) {
               this.parentSite.set(parent);
-              
+
               // Restore leaf status and enable the control
               this.siteForm.get('isLeaf')?.enable();
               this.siteForm.get('isLeaf')?.setValue(formData.isLeaf || false);
               this.isLeaf.set(formData.isLeaf || false);
-              
+
               // Re-apply validators based on leaf status
               setTimeout(() => {
                 this.onLeafToggleChange();
@@ -729,6 +742,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           });
         } else {
           // No parent site, force to parent site
+          this.parentSiteId = null;
           this.isLeaf.set(false);
           this.siteForm.get('isLeaf')?.setValue(false);
           this.siteForm.get('isLeaf')?.disable();
@@ -738,7 +752,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
         this.clearSavedData();
       }
     }
-    
+
     // Restore polygon status
     if (polygonStatus === 'true') {
       this.updatePolygonStatus();
