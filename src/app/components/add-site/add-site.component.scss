@@ -128,7 +128,12 @@
   input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    margin-top: 4px; // Move checkbox further down to align better with text baseline
+    margin: 0;
+    vertical-align: middle;
+  }
+
+  .toggle-text {
+    line-height: 18px; // Match checkbox height for perfect alignment
   }
 }
 
