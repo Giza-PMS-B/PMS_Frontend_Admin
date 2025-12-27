@@ -32,7 +32,7 @@
     "POLYGONS": "Polygons",
     "NONE_ADDED": "None Added",
     "ADDED": "Added",
-    "LEAF_TOGGLE": "Leaf Toggle"
+    "LEAF_TOGGLE": "Leaf"
   },
   "POLYGON": {
     "ADD_POLYGON": "Add Polygon",
@@ -59,8 +59,11 @@
     "SITE_NAME_LENGTH": "The site name must contain number of characters in the range 3 to 100 characters",
     "POLYGON_NAME_LENGTH": "The polygon name must contain number of characters in the range 3 to 100 characters",
     "ENGLISH_TEXT": "Please enter valid input using English letters, and the following special characters: [ - , _ , space, .]",
+    "ENGLISH_TEXT_SPECIAL_ONLY": "Invalid input: special characters must be combined with letters or numbers.",
     "ARABIC_TEXT": "Please enter valid input using Arabic letters, and the following special characters: [ - , _ , space, .]",
+    "ARABIC_TEXT_SPECIAL_ONLY": "Invalid input: special characters must be combined with letters or numbers.",
     "MIXED_TEXT": "Please enter valid input using Arabic/English letters, and the following special characters: [ - , _ , space, .]",
+    "MIXED_TEXT_SPECIAL_ONLY": "Invalid input: special characters must be combined with letters or numbers.",
     "PRICE_FORMAT": "Price must have up to 2 decimal places (e.g., 5, 5.5, 5.50)",
     "PRICE_MIN": "Price must be greater than 0",
     "PRICE_MAX": "Price cannot exceed 999.99",
@@ -74,7 +77,9 @@
     "UNIQUE_NAME": "This name is already in use",
     "UNIQUE_POLYGON": "This polygon name is already in use",
     "LATITUDE_RANGE": "Range: -90 to +90",
+    "LATITUDE_INVALID_FORMAT": "Only numbers are allowed",
     "LONGITUDE_RANGE": "Range: -180 to +180",
+    "LONGITUDE_INVALID_FORMAT": "Only numbers are allowed",
     "DECIMAL_PLACES": "Max 6 decimal places",
     "INVALID_NUMBER": "Invalid number"
   },

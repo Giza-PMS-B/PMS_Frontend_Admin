@@ -50,6 +50,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (siteForm.get('nameEn')?.errors?.['englishText']) {
                   <div>• {{ 'VALIDATION.ENGLISH_TEXT' | translate }}</div>
                 }
+                @if (siteForm.get('nameEn')?.errors?.['englishTextSpecialOnly']) {
+                  <div>• {{ 'VALIDATION.ENGLISH_TEXT_SPECIAL_ONLY' | translate }}</div>
+                }
                 @if (siteForm.get('nameEn')?.errors?.['uniqueName']) {
                   <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
                 }
@@ -76,6 +79,9 @@ import { CustomValidators } from '../../validators/custom-validators';
                 @if (siteForm.get('nameAr')?.errors?.['arabicText']) {
                   <div>• {{ 'VALIDATION.ARABIC_TEXT' | translate }}</div>
                 }
+                @if (siteForm.get('nameAr')?.errors?.['arabicTextSpecialOnly']) {
+                  <div>• {{ 'VALIDATION.ARABIC_TEXT_SPECIAL_ONLY' | translate }}</div>
+                }
                 @if (siteForm.get('nameAr')?.errors?.['uniqueName']) {
                   <div>• {{ 'VALIDATION.UNIQUE_NAME' | translate }}</div>
                 }
@@ -87,11 +93,21 @@ import { CustomValidators } from '../../validators/custom-validators';
         @if (hasParentSite()) {
           <div class="form-group">
             <label class="toggle-label">
-              <input
-                type="checkbox"
-                formControlName="isLeaf"
-                (change)="onLeafToggleChange()">
-              <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
+              @if (languageService.getIsRTL()) {
+                <!-- Arabic: checkbox first, then text (☐ موقع فرعي) -->
+                <input
+                  type="checkbox"
+                  formControlName="isLeaf"
+                  (change)="onLeafToggleChange()">
+                <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
+              } @else {
+                <!-- English: text first, then checkbox (Leaf ☐) -->
+                <span class="toggle-text">{{ 'SITE.LEAF_TOGGLE' | translate }}</span>
+                <input
+                  type="checkbox"
+                  formControlName="isLeaf"
+                  (change)="onLeafToggleChange()">
+              }
             </label>
           </div>
         } @else {
@@ -276,7 +292,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     private siteService: SiteService,
     private router: Router,
     private route: ActivatedRoute,
-    private languageService: LanguageService
+    public languageService: LanguageService
   ) {
     this.siteForm = this.createForm();
   }
@@ -291,8 +307,9 @@ export class AddSiteComponent implements OnInit, OnDestroy {
     console.log('ngOnInit - parentId:', parentId, 'siteId:', siteId, 'mode:', mode, 'polygonAdded:', polygonAdded, 'returnFrom:', returnFrom);
 
     // Clear saved data if starting fresh (no specific context parameters)
-    // Don't clear if returning from polygon form
-    if (!parentId && !siteId && !mode && !polygonAdded && !returnFrom) {
+    // Don't clear if returning from polygon form OR if there's existing form data to restore
+    const hasSavedFormData = localStorage.getItem('addSiteFormData');
+    if (!parentId && !siteId && !mode && !polygonAdded && !returnFrom && !hasSavedFormData) {
       console.log('Starting fresh - clearing any existing form data');
       this.clearSavedData();
     } else {
@@ -339,7 +356,7 @@ export class AddSiteComponent implements OnInit, OnDestroy {
       this.isLeaf.set(false);
     }
 
-    // Restore any existing form data (this handles returning from polygon form)
+    // Restore any existing form data (this handles browser reload and returning from polygon form)
     if (!this.isEditMode()) {
       this.restoreFormData();
     }
@@ -437,17 +454,19 @@ export class AddSiteComponent implements OnInit, OnDestroy {
       this.siteForm.get('integrationCode')?.clearValidators();
       this.siteForm.get('numberOfSlots')?.clearValidators();
       
-      // Clear values for leaf fields when switching to parent
-      this.siteForm.get('pricePerHour')?.setValue(null);
-      this.siteForm.get('integrationCode')?.setValue('');
-      this.siteForm.get('numberOfSlots')?.setValue(null);
-      
-      // Reset polygon status when switching to parent
-      this.polygonAdded.set(false);
-      this.polygonCount.set(0);
-      this.polygonNames.set([]);
-      localStorage.removeItem('polygonAdded');
-      localStorage.removeItem('tempPolygonData');
+      // Only clear values for leaf fields when switching to parent (not in edit mode)
+      if (!this.isEditMode()) {
+        this.siteForm.get('pricePerHour')?.setValue(null);
+        this.siteForm.get('integrationCode')?.setValue('');
+        this.siteForm.get('numberOfSlots')?.setValue(null);
+        
+        // Reset polygon status when switching to parent
+        this.polygonAdded.set(false);
+        this.polygonCount.set(0);
+        this.polygonNames.set([]);
+        localStorage.removeItem('polygonAdded');
+        localStorage.removeItem('tempPolygonData');
+      }
     }
 
     // Update form validation
@@ -784,8 +803,24 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           this.siteService.getSiteById(site.parentId).subscribe(parent => {
             if (parent) {
               this.parentSite.set(parent);
+              
+              // Enable the isLeaf control since we have a parent
+              this.siteForm.get('isLeaf')?.enable();
+              
+              // Properly configure the form based on leaf status
+              setTimeout(() => {
+                this.onLeafToggleChange();
+              }, 0);
             }
           });
+        } else {
+          // No parent site, disable leaf toggle
+          this.siteForm.get('isLeaf')?.disable();
+          
+          // Still configure the form properly for the current state
+          setTimeout(() => {
+            this.onLeafToggleChange();
+          }, 0);
         }
         
         // Check if site has polygons
@@ -794,35 +829,6 @@ export class AddSiteComponent implements OnInit, OnDestroy {
           this.polygonCount.set(site.polygons.length);
           this.polygonNames.set(site.polygons.map(p => p.name));
         }
-        
-        // Apply validators based on leaf status
-        if (site.type === 'leaf') {
-          this.siteForm.get('pricePerHour')?.setValidators([
-            Validators.required, 
-            Validators.min(0.01),
-            Validators.max(999.99),
-            CustomValidators.priceFormat()
-          ]);
-          
-          this.siteForm.get('integrationCode')?.setValidators([
-            Validators.required, 
-            Validators.minLength(3), 
-            Validators.maxLength(100),
-            CustomValidators.integrationCodeFormat()
-          ]);
-          
-          this.siteForm.get('numberOfSlots')?.setValidators([
-            Validators.required,
-            Validators.min(1),
-            Validators.max(10000),
-            CustomValidators.integer()
-          ]);
-        }
-        
-        // Update form validation
-        Object.keys(this.siteForm.controls).forEach(key => {
-          this.siteForm.get(key)?.updateValueAndValidity();
-        });
       }
     });
   }

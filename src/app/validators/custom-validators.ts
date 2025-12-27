@@ -48,12 +48,18 @@ export class CustomValidators {
 
       const value = control.value.trim();
 
-      // Check if empty after trimming or doesn't contain at least one Arabic letter
-      const hasArabicLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/.test(value);
-      if (!value || !hasArabicLetter) {
+      // Check if empty after trimming
+      if (!value) {
         return { arabicText: { value: control.value } };
       }
 
+      // Check if contains only special characters (no letters or numbers)
+      const hasLetterOrNumber = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9]/.test(value);
+      if (!hasLetterOrNumber) {
+        return { arabicTextSpecialOnly: { value: control.value } };
+      }
+
+      // Allow numeric-only input or input with Arabic letters
       // Arabic characters, numbers, and only specific special characters: - _ space .
       const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF0-9\s\-_.]+$/;
       return pattern.test(value) ? null : { arabicText: { value: control.value } };
@@ -69,12 +75,18 @@ export class CustomValidators {
 
       const value = control.value.trim();
 
-      // Check if empty after trimming or doesn't contain at least one English letter
-      const hasEnglishLetter = /[a-zA-Z]/.test(value);
-      if (!value || !hasEnglishLetter) {
+      // Check if empty after trimming
+      if (!value) {
         return { englishText: { value: control.value } };
       }
 
+      // Check if contains only special characters (no letters or numbers)
+      const hasLetterOrNumber = /[a-zA-Z0-9]/.test(value);
+      if (!hasLetterOrNumber) {
+        return { englishTextSpecialOnly: { value: control.value } };
+      }
+
+      // Allow numeric-only input or input with English letters
       // English letters, numbers, and only specific special characters: - _ space .
       const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
       return pattern.test(value) ? null : { englishText: { value: control.value } };
@@ -96,8 +108,8 @@ export class CustomValidators {
         return { integrationCodeFormat: { value: control.value } };
       }
 
-      // Accepts letters, numbers, and only specific special characters: - _ space .
-      const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
+      // Accepts letters, numbers, and only specific special characters: - _ space . |
+      const pattern = /^[a-zA-Z0-9\s\-_.|]+$/;
       return pattern.test(value) ? null : { integrationCodeFormat: { value: control.value } };
     };
   }
@@ -130,7 +142,21 @@ export class CustomValidators {
         return null;
       }
       
-      const value = parseFloat(control.value);
+      const inputValue = control.value.toString().trim();
+      
+      // Check if input contains only numbers, decimal point, and optional minus sign (no letters including 'e')
+      const validFormatPattern = /^-?\d*\.?\d*$/;
+      const hasLetters = /[a-zA-Z]/.test(inputValue);
+      if (!validFormatPattern.test(inputValue) || hasLetters) {
+        return { latitudeInvalidFormat: { value: control.value } };
+      }
+      
+      // Check if it's empty after removing valid characters
+      if (inputValue === '' || inputValue === '-' || inputValue === '.') {
+        return null; // Let required validator handle empty values
+      }
+      
+      const value = parseFloat(inputValue);
       if (isNaN(value)) {
         return { invalidLatitude: { value: control.value } };
       }
@@ -140,7 +166,7 @@ export class CustomValidators {
       }
       
       // Check decimal places (up to 6)
-      const decimalPlaces = (control.value.toString().split('.')[1] || '').length;
+      const decimalPlaces = (inputValue.split('.')[1] || '').length;
       if (decimalPlaces > 6) {
         return { latitudeDecimalPlaces: { value: control.value } };
       }
@@ -156,7 +182,21 @@ export class CustomValidators {
         return null;
       }
       
-      const value = parseFloat(control.value);
+      const inputValue = control.value.toString().trim();
+      
+      // Check if input contains only numbers, decimal point, and optional minus sign (no letters including 'e')
+      const validFormatPattern = /^-?\d*\.?\d*$/;
+      const hasLetters = /[a-zA-Z]/.test(inputValue);
+      if (!validFormatPattern.test(inputValue) || hasLetters) {
+        return { longitudeInvalidFormat: { value: control.value } };
+      }
+      
+      // Check if it's empty after removing valid characters
+      if (inputValue === '' || inputValue === '-' || inputValue === '.') {
+        return null; // Let required validator handle empty values
+      }
+      
+      const value = parseFloat(inputValue);
       if (isNaN(value)) {
         return { invalidLongitude: { value: control.value } };
       }
@@ -166,7 +206,7 @@ export class CustomValidators {
       }
       
       // Check decimal places (up to 6)
-      const decimalPlaces = (control.value.toString().split('.')[1] || '').length;
+      const decimalPlaces = (inputValue.split('.')[1] || '').length;
       if (decimalPlaces > 6) {
         return { longitudeDecimalPlaces: { value: control.value } };
       }
@@ -184,12 +224,18 @@ export class CustomValidators {
 
       const value = control.value.trim();
 
-      // Check if empty after trimming or doesn't contain at least one letter (Arabic or English)
-      const hasLetter = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z]/.test(value);
-      if (!value || !hasLetter) {
+      // Check if empty after trimming
+      if (!value) {
         return { mixedText: { value: control.value } };
       }
 
+      // Check if contains only special characters (no letters or numbers)
+      const hasLetterOrNumber = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9]/.test(value);
+      if (!hasLetterOrNumber) {
+        return { mixedTextSpecialOnly: { value: control.value } };
+      }
+
+      // Allow numeric-only input or input with Arabic/English letters
       // Arabic and English characters, numbers, and only specific special characters: - _ space .
       const pattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFFa-zA-Z0-9\s\-_.]+$/;
       return pattern.test(value) ? null : { mixedText: { value: control.value } };
