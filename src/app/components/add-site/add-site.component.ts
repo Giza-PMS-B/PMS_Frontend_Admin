@@ -232,16 +232,21 @@ import { CustomValidators } from '../../validators/custom-validators';
         }
 
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" (click)="goBack()">
+          <button
+            type="button"
+            id="cancel-site-btn"
+            class="btn btn-secondary"
+            (click)="goBack()">
             {{ 'COMMON.CANCEL' | translate }}
           </button>
-          <button 
-            type="submit" 
-            class="btn btn-primary" 
+          <button
+            type="submit"
+            id="save-site-btn"
+            class="btn btn-primary"
             [disabled]="!isFormReady()">
             {{ isEditMode() ? ('COMMON.EDIT' | translate) : ('COMMON.SAVE' | translate) }}
           </button>
-          
+
           @if (isLeaf() && !polygonAdded() && siteForm.valid) {
             <div class="save-requirement-message">
               <small class="text-warning">
