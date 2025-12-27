@@ -73,6 +73,7 @@
     "INTEGRATION_CODE_EXISTS": "Integration Code Already Exists",
     "SITE_NAME_EXISTS": "The site name is already existed",
     "SITE_NAME_EXISTS_AT_LEVEL": "A site with the same name already exists at this level",
+    "SITE_NAME_SAME_AS_PARENT": "Site name cannot be the same as its parent name",
     "INTEGRATION_CODE_ALREADY_EXISTS": "Integration code already existed",
     "VALUES_ALREADY_EXISTS": "This data already exists",
     "UNIQUE_NAME": "This name is already in use",

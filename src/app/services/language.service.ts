@@ -70,7 +70,8 @@ export class LanguageService {
       'these values are already exist': 'VALIDATION.VALUES_ALREADY_EXISTS', // Handle grammar variations
       'values are already exists': 'VALIDATION.VALUES_ALREADY_EXISTS',
       'values already exist': 'VALIDATION.VALUES_ALREADY_EXISTS',
-      'a site with the same name already exists at this level': 'VALIDATION.SITE_NAME_EXISTS_AT_LEVEL'
+      'a site with the same name already exists at this level': 'VALIDATION.SITE_NAME_EXISTS_AT_LEVEL',
+      'site name cannot be the same as its parent name': 'VALIDATION.SITE_NAME_SAME_AS_PARENT'
     };
 
     // Check if we have a translation for this error message
