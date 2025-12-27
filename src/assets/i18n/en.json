@@ -72,6 +72,7 @@
     "INTEGRATION_CODE_FORMAT": "Please enter a valid format",
     "INTEGRATION_CODE_EXISTS": "Integration Code Already Exists",
     "SITE_NAME_EXISTS": "The site name is already existed",
+    "SITE_NAME_EXISTS_AT_LEVEL": "A site with the same name already exists at this level",
     "INTEGRATION_CODE_ALREADY_EXISTS": "Integration code already existed",
     "VALUES_ALREADY_EXISTS": "This data already exists",
     "UNIQUE_NAME": "This name is already in use",
