@@ -178,11 +178,16 @@ import { CustomValidators } from '../../validators/custom-validators';
         </div>
 
         <div class="form-actions">
-          <button type="button" class="btn btn-secondary" (click)="goBack()">
+          <button
+            type="button"
+            id="cancel-polygon-btn"
+            class="btn btn-secondary"
+            (click)="goBack()">
             {{ 'COMMON.CANCEL' | translate }}
           </button>
-          <button 
-            type="submit" 
+          <button
+            type="submit"
+            id="save-polygon-btn"
             class="btn btn-primary"
             [disabled]="!isFormReady()">
             {{ isEdit() ? ('POLYGON.UPDATE_POLYGON' | translate) : ('POLYGON.SAVE_POLYGON' | translate) }}
