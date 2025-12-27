@@ -108,8 +108,8 @@ export class CustomValidators {
         return { integrationCodeFormat: { value: control.value } };
       }
 
-      // Accepts letters, numbers, and only specific special characters: - _ space .
-      const pattern = /^[a-zA-Z0-9\s\-_.]+$/;
+      // Accepts letters, numbers, and only specific special characters: - _ space . |
+      const pattern = /^[a-zA-Z0-9\s\-_.|]+$/;
       return pattern.test(value) ? null : { integrationCodeFormat: { value: control.value } };
     };
   }
