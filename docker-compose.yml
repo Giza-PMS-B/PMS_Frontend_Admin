@@ -6,12 +6,13 @@ services:
     ports:
       - "8085:80"
     networks:
-      - pms-net
+      - pms-network
     deploy:
       replicas: 2
       restart_policy:
         condition: on-failure
 
 networks:
-  pms-net:
-    driver: overlay
+  pms-network:
+    external: true
+
